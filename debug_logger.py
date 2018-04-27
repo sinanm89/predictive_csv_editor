@@ -10,17 +10,21 @@ class QDbgConsole(QTextEdit):
     interface.
     '''
     # Feel free to adjust those
-    WIDTH  = 480
-    HEIGHT = 160
+    WIDTH  = 500
+    HEIGHT = 140
+    PADDING = 20
     hidden = False
     
-    def __init__(self, parent=None, w=WIDTH, h=HEIGHT):
+    def __init__(self, parent=None, w=WIDTH, h=HEIGHT, debug=False):
         super(QDbgConsole, self).__init__(parent)
         
         self._buffer = StringIO()
 
         self.resize(w, h)
-        self.move(20, parent.height - h - 20)
+        if debug:
+            self.move(20, parent.height - h - self.PADDING)
+        else:
+            self.move(20, parent.height - h*2 - self.PADDING)
         self.setReadOnly(True)
 
     ### File-like interface ###

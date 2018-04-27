@@ -1,11 +1,19 @@
 import sys
-from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QPushButton, QAction, QLineEdit, QMessageBox, QTextEdit
+from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QPushButton, QAction, QLineEdit, QMessageBox, QTextEdit, QLabel
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import pyqtSlot, Qt
+from PyQt5.QtCore import pyqtSlot, Qt, pyqtRemoveInputHook
 from reader import read_the_csv_files, list_all_files
 import csv
 from debug_logger import QDbgConsole
 from sample_dict import input_dict as sample_input_dict
+
+DEBUG = True
+
+def pdb(*args, **kwargs):
+    pyqtRemoveInputHook()
+    import pdb
+    pdb.set_trace()
+
 
 def dict_reduce(input_dict, top_level=False):
     """Reduce a given dict with random elements into one."""
@@ -28,123 +36,106 @@ def dict_reduce(input_dict, top_level=False):
             val = dict_reduce(val[0])
             key = "list__{0}".format(key)
             output[key] = val
-        if type(val) in [str, int, bool]:
+        if type(val) in [str, int, bool, float]:
             del_keys.append(key)
             val = type(val)
             # output['{key}.{val}'.format(key=key, val=type(val))] = 'value'
-            output['{key}'.format(key=key, val=val)] = type(val)
+            output['{key}'.format(key=key, val=val)] = '__val'
         else:
             output[key] = val
 
-    # for i in del_keys:
-    #     if output.get(i):
-    #         del output[i]
     return output
-
-def line_unpack(self, line):
-    if type(line) == list:
-        line = line[1]
-    key_hierarchy = line.split('.')
-    for key in key_hierarchy:
-        cursor = self.frequency_map.get(key, None)
-        if cursor
-
-
-# def run_me():
-    # {'brandInfo': {"chainCode.<class 'str'>": 'value'},
-    # "Telecommute.<class 'bool'>": 'value', 'list__contact': {
-    # "faxNumber.<class 'str'>": 'value', "reservationsPhoneNumber.<class 'str'>": 'value',
-    # "reservationsPhoneNumberMessage.<class 'bool'>": 'value',
-    # "frontDeskNumber.<class 'str'>": 'value', "email.<class 'str'>": 'value'}}
-
-#     ii = {
-#         "brandInfo": {
-#             "chainCode": "IC",
-#         },
-#         "Telecommute": True,
-#         "contact": [
-#             {
-#                 "faxNumber": "1-404-9469001",
-#                 "reservationsPhoneNumber": None,
-#                 "reservationsPhoneNumberMessage": False,
-#                 "frontDeskNumber": "1-404-9469190",
-#                 "email": "icbsales@ihg.com"
-#             }
-#     ]}  
-#     ee = dict_reduce(ii, True)
-#     print(ee)
-#     return 0
 
 
 class App(QMainWindow):
  
     def __init__(self):
         super().__init__()
-        self.title = 'PyQt5 textbox'
-        self.left = 10
-        self.top = 10
-        self.width = 800
-        self.height = 600
-        self.selected = False
+        self.title = 'Predictive Freq Mapper'
+        
         self.init_data()
         self.initUI()
-        self.saved_lines = []
  
     def init_data(self):
-        self.reduced_dict = dict_reduce(sample_input_dict)
-        print(self.reduced_dict)
+        self.read_csv_lines()
+        self.line_counter = 0
+        self.apigee_schema = dict_reduce(sample_input_dict)
+        self.frequency_map = {}
+        self.left = 10
+        self.top = 10
+        self.width = 650
+        self.height = 600
+        self.selected = False
+        self.saved_lines = []
 
 
     def initUI(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
  
-        # Create textbox
-        self.textbox = MappingTextEditor(self)
-        self.textbox.move(20, 160)
-        self.textbox.resize(280,60)
+        # Create predicted box
+        padding = 20
+        size_x = 600
+        self.predicted_box = QLineEdit(self)
+        self.predicted_box.move(padding, padding)
+        self.predicted_box.resize(size_x, 60)
+        self.predicted_box.setReadOnly(True)
 
-        # Create textbox
-        self.display_box = QTextEdit(self)
-        self.display_box.setReadOnly(True)
-        self.display_box.move(20, 20)
-        self.display_box.resize(580,40)
-        
-        # Create read and possible boxes
-        self.possible_db = QLineEdit(self)
-        self.already_there_db = QLineEdit(self)
-        self.dbs = [self.possible_db, self.already_there_db]
-        
-        # set boxes
-        size_x = 300
-        i = 0
-        move_x = 0
-        for _dbi in self.dbs:
-            move_x = 20 + (size_x*i + 20*i)
-            _dbi.setReadOnly(True)
-            _dbi.resize(size_x, 60)
-            _dbi.move(move_x, 100)
-            i += 1
- 
-        self.set_text_on_boxes()
-        self.line_counter = 0
-        
+        # Create input_box
+        self.input_box = QLineEdit(self)
+        self.input_box.move(
+            self.predicted_box.pos().x(),
+            self.predicted_box.pos().y() + self.predicted_box.height() + padding*2
+        )
+        self.input_box.resize(
+            self.predicted_box.width(),
+            self.predicted_box.height() - padding
+        )
+
+        # Create Current box 
+        self.current_box = QLineEdit(self)        
+        self.current_box.move(
+            self.input_box.pos().x(),
+            self.input_box.pos().y() + self.input_box.height() + padding*2
+        )
+        self.current_box.resize(
+            size_x,
+            self.predicted_box.height()
+        )
+        self.current_box.setReadOnly(True)
+
+    
         # debugger 
-        self.debugger = QDbgConsole(parent=self)
+        self.debuggers = []
+        self.debugger_box = QDbgConsole(parent=self, debug=DEBUG)
+        self.history_box = QDbgConsole(parent=self)
 
+        # label things
+        self.set_label_for(self.predicted_box,'Predicted')
+        self.set_label_for(self.current_box, 'Current')
+        self.set_label_for(self.history_box, 'Past')
+        self.set_label_for(self.input_box, 'Line')
+        self.set_label_for(self.debugger_box, 'debugger')
+    
         self.show()
     
 
-    @pyqtSlot()
-    def on_click(self):
-        textboxValue = self.textbox.text()
-        self.get_next_line()
-        # QMessageBox.question(self, 'MESAJ', "You typed: " + textboxValue, QMessageBox.Ok, QMessageBox.Ok)
-        self.textbox.setText("")
+    def set_label_for(self, parent, text='No Text', padding=15):
+        label = QLabel(self)
+        label.setText(text)
+        label.move(
+            parent.pos().x(), 
+            parent.pos().y() - padding
+        )
+        label.resize(
+            parent.width(),
+            20
+            )
 
     @pyqtSlot()
     def keyPressEvent(self, event):
-        print(event.key())
+        pyqtRemoveInputHook()
+
         if event.key() == Qt.Key_Escape:
             self.close()
 
@@ -152,41 +143,52 @@ class App(QMainWindow):
             # self.dbs[0].setText("asf"*10)
             # if(self.line_counter == 0):
             line = self.get_next_line()
-            self.display_box.setText(line[1] or 'null')
+            # self.display_box.setText(line[1] or 'null')
             # search_and_suggest()
             # self.possible_db
-            self.already_there_db.setText(line[3] or 'null')
+            self.current_box.setText(line[3] or 'null')
             # self.display_box.setText(lines)
         elif event.key() == Qt.Key_Return:
-            line = self.get_next_line()
-            line[3] = self.textbox.text()
-            self.saved_lines.append(line)
-            print(line)
+            self.return_enter_event()
 
-            self.reduced_dict
-            self.debugger.setText(str(line))
-            # print(dir(self.textbox))
-        # elif event.key():
-            # import pdb; pdb.set_trace()
-        # if event.key() == Qt.Key_Tab:
-        #     print('hello')
-        #     self.textbox.setFocus()
+    def return_enter_event(self):
+        line = self.get_next_line()
+        self.history_box.setText('\n'.join(line))
+        line[3] = self.input_box.text()
+        self.saved_lines.append(line)
+        self.line_postprocessor(line)
+        self.debugger_box.setText('\n'.join(line))
+
+
 
     def closeEvent(self, event):
         event.accept()
 
-    def get_current_line():
-        return self.saved_lines[self.line_counter]
+
+    def line_unpack(self, line):
+        key_hierarchy = line.split('.')
+        for key in key_hierarchy:
+            self.frequency_map.get(key, None)
+            # if temp_cursor:
+
+    def line_postprocessor(self, line):
+        our_key = line[3]
+        source_key = line[1]
+
+    def get_current_line(self):
+        return self.read_csv_data[self.line_counter]
 
     def get_next_line(self):
+        self.get_current_line()
         if self.line_counter < len(self.read_csv_data) - 1:
             line = self.read_csv_data[self.line_counter]
             self.line_counter += 1
-            self.debugger.setText('\n'.join(line))
+            self.debugger_box.setText('\n'.join(line))
+            self.line_postprocessor(line)
             return line
         return '--==No Line Read==--'
  
-    def set_text_on_boxes(self):
+    def read_csv_lines(self):
         # self.frequency_map = read_the_csv_files()
         # print(self.frequency_map)
         list_of_files = list_all_files()
@@ -202,6 +204,5 @@ class App(QMainWindow):
 if __name__ == '__main__':
     # run_me()
     app = QApplication(sys.argv)
-
     ex = App()
     sys.exit(app.exec_())

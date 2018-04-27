@@ -111,7 +111,6 @@ def read_the_csv_files():
 
 def main():
     ee = read_the_csv_files()
-    import pdb; pdb.set_trace()
 
 if __name__ == '__main__':
     # sys.argv[1]
