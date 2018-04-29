@@ -9,6 +9,18 @@ from sample_dict import input_dict as sample_input_dict
 
 DEBUG = True
 
+
+# def dict_enlarge(input_dict):
+#     key_dict = {}
+
+#     column = column.split('.')
+#     for i in range(len(column)):
+#         if key_dict.get(key, None) is None:
+            
+#         else:
+#             # key_dict[key] = dict_enlarge(input_dict[key])
+
+
 def pdb(*args, **kwargs):
     pyqtRemoveInputHook()
     import pdb
@@ -36,12 +48,13 @@ def dict_reduce(input_dict, top_level=False):
             val = dict_reduce(val[0])
             key = "list__{0}".format(key)
             output[key] = val
-        if type(val) in [str, int, bool, float]:
+        elif type(val) in [str, int, bool, float]:
             del_keys.append(key)
             val = type(val)
             # output['{key}.{val}'.format(key=key, val=type(val))] = 'value'
             output['{key}'.format(key=key, val=val)] = '__val'
         else:
+            pdb()
             output[key] = val
 
     return output
@@ -67,6 +80,7 @@ class App(QMainWindow):
         self.height = 600
         self.selected = False
         self.saved_lines = []
+        self._save_confirmation = False
 
 
     def initUI(self):
@@ -92,30 +106,16 @@ class App(QMainWindow):
             self.predicted_box.height() - padding
         )
 
-        # Create Current box 
-        self.current_box = QLineEdit(self)        
-        self.current_box.move(
-            self.input_box.pos().x(),
-            self.input_box.pos().y() + self.input_box.height() + padding*2
-        )
-        self.current_box.resize(
-            size_x,
-            self.predicted_box.height()
-        )
-        self.current_box.setReadOnly(True)
-
-    
         # debugger 
         self.debuggers = []
-        self.debugger_box = QDbgConsole(parent=self, debug=DEBUG)
-        self.history_box = QDbgConsole(parent=self)
+        self.history_box = QDbgConsole(parent=self, debug=DEBUG)
+        self.current_box = QDbgConsole(parent=self)
 
         # label things
         self.set_label_for(self.predicted_box,'Predicted')
-        self.set_label_for(self.current_box, 'Current')
         self.set_label_for(self.history_box, 'Past')
         self.set_label_for(self.input_box, 'Line')
-        self.set_label_for(self.debugger_box, 'debugger')
+        self.set_label_for(self.current_box, 'Current')
     
         self.show()
     
@@ -134,32 +134,41 @@ class App(QMainWindow):
 
     @pyqtSlot()
     def keyPressEvent(self, event):
-        pyqtRemoveInputHook()
-
         if event.key() == Qt.Key_Escape:
             self.close()
 
         if event.key() == Qt.Key_R:
-            # self.dbs[0].setText("asf"*10)
-            # if(self.line_counter == 0):
             line = self.get_next_line()
-            # self.display_box.setText(line[1] or 'null')
-            # search_and_suggest()
-            # self.possible_db
-            self.current_box.setText(line[3] or 'null')
-            # self.display_box.setText(lines)
+            self.current_box.setText('\n'.join(line))
         elif event.key() == Qt.Key_Return:
             self.return_enter_event()
 
     def return_enter_event(self):
-        line = self.get_next_line()
-        self.history_box.setText('\n'.join(line))
-        line[3] = self.input_box.text()
-        self.saved_lines.append(line)
-        self.line_postprocessor(line)
-        self.debugger_box.setText('\n'.join(line))
+        line = self.get_current_line()
+        delta_val = self.input_box.text()
+        # some_val
+        if self._save_confirmation:
+            line[3] = delta_val
+            self.saved_lines.append(line)
+            self.line_postprocessor(line)
+            line = self.get_next_line()
+            # reset state to false so it doesnt save next time
+            self.set_save_state()
+            self.input_box.setStyleSheet("")
+            self.input_box.setText("")
+            print('saved val: ', str(line[3]))
+        elif delta_val is not line[3] and delta_val is not '':
+            line[3] = delta_val
+            # set state to true so we can save
+            self.set_save_state()
+            self.input_box.setStyleSheet("border: 3px solid red;")
+        self.current_box.setText('\n'.join(line))
 
-
+    def set_save_state(self, state=None):
+        if state is None:
+            self._save_confirmation = not self._save_confirmation
+        else:
+            self._save_confirmation = state
 
     def closeEvent(self, event):
         event.accept()
@@ -179,12 +188,10 @@ class App(QMainWindow):
         return self.read_csv_data[self.line_counter]
 
     def get_next_line(self):
-        self.get_current_line()
+        self.history_box.setText('\n'.join(self.get_current_line()))
         if self.line_counter < len(self.read_csv_data) - 1:
-            line = self.read_csv_data[self.line_counter]
             self.line_counter += 1
-            self.debugger_box.setText('\n'.join(line))
-            self.line_postprocessor(line)
+            line = self.read_csv_data[self.line_counter]
             return line
         return '--==No Line Read==--'
  

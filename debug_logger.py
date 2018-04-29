@@ -22,9 +22,9 @@ class QDbgConsole(QTextEdit):
 
         self.resize(w, h)
         if debug:
-            self.move(20, parent.height - h - self.PADDING)
+            self.move(20, parent.height - h*2 + self.PADDING)
         else:
-            self.move(20, parent.height - h*2 - self.PADDING)
+            self.move(20, parent.height - h*3 + self.PADDING)
         self.setReadOnly(True)
 
     ### File-like interface ###
