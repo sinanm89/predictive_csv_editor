@@ -20,10 +20,11 @@ class QDbgConsole(QTextEdit):
         
         self._buffer = StringIO()
 
-        self.resize(w, h)
         if debug:
-            self.move(20, parent.height - h*2 + self.PADDING)
+            self.resize(w, h-30)
+            self.move(20, parent.height - h*2 + self.PADDING*7)
         else:
+            self.resize(w, h)
             self.move(20, parent.height - h*3 + self.PADDING)
         self.setReadOnly(True)
 
