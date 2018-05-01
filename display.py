@@ -8,12 +8,21 @@ from debug_logger import QDbgConsole
 from sample_dict import input_dict as sample_input_dict
 import uuid
 
-from backup import ss as previously_saved_lines
-from copy import copy
-from previous_freq_map import prev_freq_map as freq_map
+from PP_freq_map_backup import prev_freq_map
+
+file_names = [
+ 'evenHCM','holidayinnclubvacationsHCM','holidayInnHCM', 'holidayinnResortsHCM',
+ 'hotelIndigoHCM', 'hualuxeHCM', 'ihgHCM', 'intercontinentalHCM', 'staybridgeHCM'
+ ]
 
 DEBUG = True
 
+def get_old_backups(file_name):
+    file_name.split('.')[-1]
+    with open(file_name, newline='') as csvfile:
+        reader = csv.reader(csvfile)
+        read_csv_data = list(reader)
+    return derive_freq_map(read_csv_data)
 
 def pdb(*args, **kwargs):
     pyqtRemoveInputHook()
@@ -23,16 +32,30 @@ def derive_freq_map(saved_lines):
     derived_freq_map = {}
     for i in saved_lines:
         if i[3] is '' or None:
-            print('===CORRUPT LINE #{index} :{line}'.format(line=str(i), index=i.index(i)))
+            print('===CORRUPT LINE #{index}'.format(index=i))
+            continue
+        # if f_map.get(i[1], None) is None:
         derived_freq_map[i[1]] = i[3]
     return derived_freq_map
 
-def run_me():
-    # freq_map = derive_freq_map(previously_saved_lines)
+def do_tests():
+    with open('tests/T____output_test.csv', 'w') as temp_file:
+        writer = csv.writer(temp_file)
+        writer.writerows(['1','2','3'])
+    print('~~~Wrote test file: T____output_test.csv')
 
-    # list_of_files = list_all_files()
-    # print(list_all_files())
+    with open("tests/T___freq_map_test.py", 'w') as temp_file:
+        temp_file.write('T___prev_freq_map = {freq_map}'.format(freq_map=str({'hello':'world'})))
+    
+    print('~~~Wrote test file: freq_map_test.py')
+
+def run_me():
+
+    do_tests()
+    
+    freq_map = prev_freq_map
     file_name = sys.argv[1]
+
     with open(file_name, newline='') as csvfile:
         reader = csv.reader(csvfile)
         read_csv_data = list(reader)
@@ -52,21 +75,29 @@ def run_me():
             saved_rows.append(pr)
         else:
             print('~~~!OOPS COULDNT FIND!~~~')
+            print(pr)
             import pdb;pdb.set_trace()
             freq_map[pr[1]] = pr[3]
             saved_rows.append(pr)
     
-    # try:
-    # import pdb; pdb.set_trace()
-    file_name = sys.argv[1]
-    with open('previous_saved_lines__{0}'.format(file_name), 'w') as temp_file:
-        writer = csv.writer(temp_file)
-        writer.writerows(saved_rows)
-    
-    with open('previous_freq_map.py', 'w') as temp_file:
-        temp_file.write('prev_freq_map = {freq_map}'.format(freq_map=str(freq_map)))
-    # except Exception:
-        # import pdb; pdb.set_trace()
+    print('====================={0}'.format('WRITE FILE???'))
+    import pdb; pdb.set_trace()
+    file_name = file_names[-1]
+    try:
+        with open('XX_output__{0}.csv'.format(file_name), 'w') as temp_file:
+            writer = csv.writer(temp_file)
+            writer.writerows(saved_rows)
+        print('~~~Wrote: ', 'XX_output__{0}.csv'.format(file_name))
+
+        with open("PP_freq_map__{0}.py".format(file_name), 'w') as temp_file:
+            temp_file.write('prev_freq_map = {freq_map}'.format(freq_map=str(freq_map)))
+    except Exception:
+        print('!!!!!!!!!{0}'.format('WRITE FAILED'))
+        
+        import pdb; pdb.set_trace()
+        
+
+    print('~~~Wrote: ', "PP_freq_map__{0}.py".format(file_name))
 
 def dict_reduce(input_dict, top_level=False):
     """Reduce a given dict with random elements into one."""

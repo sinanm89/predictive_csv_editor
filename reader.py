@@ -78,9 +78,9 @@ def breakdown_key(key_list, key_map):
         key_map[key] = breakdown_key(key_list, key_map.get(key, {}))
     return key_map
 
-def list_all_files():
+def list_all_files(walk_path='.'):
     f = []
-    for (dirpath, dirnames, filenames) in walk('.'):
+    for (dirpath, dirnames, filenames) in walk(walk_path):
         f.extend(filenames)
         break
     return f
