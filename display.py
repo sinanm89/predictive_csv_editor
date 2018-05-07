@@ -10,10 +10,11 @@ import uuid
 
 from PP_freq_map_backup import prev_freq_map
 
-file_names = [
- 'evenHCM','holidayinnclubvacationsHCM','holidayInnHCM', 'holidayinnResortsHCM',
- 'hotelIndigoHCM', 'hualuxeHCM', 'ihgHCM', 'intercontinentalHCM', 'staybridgeHCM'
- ]
+
+# USEFUL COMMANDS
+
+# SAVEFILE # with open('05__backup_f.py', 'w') as tf: tf.write('prev_freq_map = {freq_map}'.format(freq_map=str(freq_map)))
+# AUTO EDIT # pr[3]='hotelinfo.{0}'.format(pr[1].lstrip('hotelContent.'));print('\n|===> '+pr[3] + '\n>>' + pr[2])
 
 DEBUG = True
 
@@ -46,13 +47,47 @@ def do_tests():
 
     with open("tests/T___freq_map_test.py", 'w') as temp_file:
         temp_file.write('T___prev_freq_map = {freq_map}'.format(freq_map=str({'hello':'world'})))
-    
+
     print('~~~Wrote test file: freq_map_test.py')
 
-def run_me():
+def run_filler():
+    file_list = list_all_files('csv_files')
+    for file_name in file_list:
+        if '.csv' in file_name:
+            write_csv_from_freq_map(file_name)
+    import pdb; pdb.set_trace()
+
+def write_csv_from_freq_map(file_name):
+
+    with open('csv_files/' + file_name, newline='') as csvfile:
+        reader = csv.reader(csvfile)
+        read_csv_data = list(reader)
+
+    saved_rows = []
+    # try:
+    for line in read_csv_data:
+        key = line[1]
+        val = prev_freq_map.get(key, None)
+        if line == ['', '', '', '', '', '', '']:
+            print(line)
+            continue
+        # elif val is None:
+            # import pdb; pdb.set_trace()
+
+        line[3] = val
+        saved_rows.append(line)
+
+    with open('OUTPUT_{}'.format(file_name), 'w') as temp_file:
+        writer = csv.writer(temp_file)
+        writer.writerows(saved_rows)
+
+    # except Exception:
+        # import pdb; pdb.set_trace()
+
+def run_derivation():
 
     do_tests()
-    
+
     freq_map = prev_freq_map
     file_name = sys.argv[1]
 
@@ -79,7 +114,7 @@ def run_me():
             import pdb;pdb.set_trace()
             freq_map[pr[1]] = pr[3]
             saved_rows.append(pr)
-    
+
     print('====================={0}'.format('WRITE FILE???'))
     import pdb; pdb.set_trace()
     file_name = file_names[-1]
@@ -93,9 +128,9 @@ def run_me():
             temp_file.write('prev_freq_map = {freq_map}'.format(freq_map=str(freq_map)))
     except Exception:
         print('!!!!!!!!!{0}'.format('WRITE FAILED'))
-        
+
         import pdb; pdb.set_trace()
-        
+
 
     print('~~~Wrote: ', "PP_freq_map__{0}.py".format(file_name))
 
@@ -133,14 +168,14 @@ def dict_reduce(input_dict, top_level=False):
 
 
 # class App(QMainWindow):
- 
+
 #     def __init__(self):
 #         super().__init__()
 #         self.title = 'Predictive Freq Mapper'
-        
+
 #         self.init_data()
 #         self.initUI()
- 
+
 #     def init_data(self):
 #         self.read_csv_lines()
 #         self.line_counter = 0
@@ -158,7 +193,7 @@ def dict_reduce(input_dict, top_level=False):
 #     def initUI(self):
 #         self.setWindowTitle(self.title)
 #         self.setGeometry(self.left, self.top, self.width, self.height)
- 
+
 #         # Create predicted box
 #         padding = 20
 #         size_x = 600
@@ -178,7 +213,7 @@ def dict_reduce(input_dict, top_level=False):
 #             self.predicted_box.height() - padding
 #         )
 
-#         # debugger 
+#         # debugger
 #         self.debuggers = []
 #         self.history_box = QDbgConsole(parent=self, debug=DEBUG)
 #         self.current_box = QDbgConsole(parent=self)
@@ -188,15 +223,15 @@ def dict_reduce(input_dict, top_level=False):
 #         self.set_label_for(self.history_box, 'Past')
 #         self.set_label_for(self.input_box, 'Line')
 #         self.set_label_for(self.current_box, 'Current')
-    
+
 #         self.show()
-    
+
 
 #     def set_label_for(self, parent, text='No Text', padding=15):
 #         label = QLabel(self)
 #         label.setText(text)
 #         label.move(
-#             parent.pos().x(), 
+#             parent.pos().x(),
 #             parent.pos().y() - padding
 #         )
 #         label.resize(
@@ -233,7 +268,7 @@ def dict_reduce(input_dict, top_level=False):
 # #     column = column.split('.')
 # #     for i in range(len(column)):
 # #         if freq_d.get(key, None) is None:
-        
+
 # #         else:
 # #             key_dict[key] = dict_enlarge(input_dict[key])
 
@@ -317,7 +352,7 @@ def dict_reduce(input_dict, top_level=False):
 #             line = self.read_csv_data[self.line_counter]
 #             return line
 #         return '--==No Line Read==--'
- 
+
 
 #     def read_csv_lines(self):
 #         # self.frequency_map = read_the_csv_files()
@@ -337,7 +372,7 @@ def dict_reduce(input_dict, top_level=False):
 
 
 if __name__ == '__main__':
-    run_me()
+    run_filler()
     # app = QApplication(sys.argv)
     # ex = App()
     # sys.exit(app.exec_())

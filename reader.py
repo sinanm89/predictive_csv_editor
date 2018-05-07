@@ -2,7 +2,7 @@ import sys
 import csv
 from os import walk
 
-_REF = "$ref" 
+_REF = "$ref"
 tab_count = 0
 next_tab_count = 0
 frequency_map = {}
@@ -50,7 +50,7 @@ frequency_map = {}
 #         while i < len(lines_to_read):
 #             check_case(line, 'definitions', rest_of_the_lines[i:])
 #             i += 1
-            
+
 
 def does_word_exist(line, search_word, line_number=False):
     if line[0] == ' ':
@@ -78,7 +78,7 @@ def breakdown_key(key_list, key_map):
         key_map[key] = breakdown_key(key_list, key_map.get(key, {}))
     return key_map
 
-def list_all_files(walk_path='.'):
+def list_all_files(walk_path='.', show_only='.csv'):
     f = []
     for (dirpath, dirnames, filenames) in walk(walk_path):
         f.extend(filenames)
@@ -87,7 +87,7 @@ def list_all_files(walk_path='.'):
 
 def read_the_csv_files():
     list_of_files = list_all_files()
-    
+
     for file in list_of_files:
         if not '.csv' in file:
             continue
