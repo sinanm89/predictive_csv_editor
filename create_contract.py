@@ -3,25 +3,9 @@ import collections
 from reader import read_the_csv_files, list_all_files
 from FINAL_freq_map_backup import prev_freq_map as FREQ_MAP
 import json
+import uuid
+from datetime import datetime
 
-example_dict = {
-    'hotelContent.rooms.hotelHighlights.roomCounts.nonSmokingRoomCount': 'hotelinfo.profile.nonSmokingRoomCount',
-    'hotelContent.generalPropertyDetails.profile.femaNumber': 'hotelinfo.profile.femaNumber',
-    'hotelContent.facilities.parking.carParkingAvailable': 'hotelinfo.parking.carParkingAvailable',
-    'hotelContent.facilities.parking.valetParkingAvailable': 'hotelinfo.parking.valetParkingAvailable',
-    'hotelContent.facilities.parking.dailyValetParkingFee': 'hotelinfo.parking.dailyValetParkingFee',
-    'hotelContent.facilities.parking.parkingDescription.value': 'hotelinfo.parking.parkingDescription',
-    'hotelContent.generalPropertyDetails.checkOut.lateCheckOutAvailable': 'hotelinfo.parking.lateCheckoutAvailable',
-    'hotelContent.generalPropertyDetails.petPolicy.petsAllowed': 'hotelInfo.facilities.petsAllowed',
-    'hotelContent.generalPropertyDetails.petPolicy.guideDogsOrServiceAnimalsAllowed': 'hotelInfo.facilities.guideDogsOrServiceAnimalsAllowed',
-    'hotelContent.facilities.publicAreas.interiorCorridors': 'hotelinfo.facilities.publicInteriorCorridors',
-    'hotelContent.facilities.publicAreas.exteriorCorridors': 'hotelinfo.facilities.publicExteriorCorridors',
-    'hotelContent.marketing.marketingText.hotelMajorFeature.value': 'hotelInfo.location.introText or hotelInfo.profile.shortDescription'
-}
-
-TAB = ' '
-
-base_definition: ['type: ', 'properties:']
 _input_dict = None
 
 DETAIL_MAP = {}
@@ -32,22 +16,23 @@ def dict_reduce(input_dict):
     for key in input_dict.keys():
         # {'value': 'Apigee', 'keys_value': 'value', 'val_type': 'string', 'extras': []}
         #  get the actual key name value
-        lookup_val = input_dict[key]['value']
+        lookup_val = input_dict[key]['long_key']
         value = lookup_val.split('.')
+        if '' in value:
+            print('=====EMPTY VALUE IN INPUT DICT')
         if len(value) <= 2:
-            # import pdb; pdb.set_trace()
             continue
         if value == 'MISSING':
-            print('------' +key)
+            print('=====MISSING KEY' + key)
             continue
-        output = create_hierarchy(output, lookup_val)
+        output = create_hierarchy(output, input_dict[key])
 
     return output
 
-def create_hierarchy(output, long_key):
-    keys = long_key.split('.')
+def create_hierarchy(output, meta):
+    keys = meta['long_key'].split('.')
     nested_input = create_nested(keys)
-    updated_hierarchy = update_or_create_nested(output, nested_input)
+    updated_hierarchy = update_or_create_nested(output, nested_input, meta)
     return updated_hierarchy
 
 def get_type(val):
@@ -81,9 +66,12 @@ def read_csv_values():
             key = line[1]
             if key == '':
                 continue
-
+            if FREQ_MAP.get(key) == None:
+                continue
+            if FREQ_MAP.get(key) == '':
+                continue
             updated_freq_map[key] = {
-                'value': FREQ_MAP.get(key),
+                'long_key': FREQ_MAP.get(key, ''),
                 'keys_value': line[2],
                 'val_type': get_type(line[2]),
                 'extras': [],
@@ -91,11 +79,69 @@ def read_csv_values():
 
     return updated_freq_map
 
-def create_contract(u_f_m):
-    attributes = u_f_m.keys()
+def create_contract(payload_hierarchy_map):
+    # attributes = payload_hierarchy_map.keys()
+    for att_k, att_v in payload_hierarchy_map.items():
+        create_contract_block(att_v, att_k)
 
-    for att in attributes:
-        u_f_m.get(att)
+
+def create_contract_block(value_map, key):
+    """
+        properties:
+            sideQuest:
+                type: string
+                $ref: '#definitions/{REFERENCE_OBJ}'
+    """
+    if last_item_in_tier(value_map):
+        return write_contract_block(value_map, key)
+    for k, v in value_map.items():
+        if k and k[0] == '_':
+            continue
+        # write these into the file block now
+        create_contract_block(v, k)
+        if key == '':
+            import pdb; pdb.set_trace()
+        write_contract_block(value_map, key)
+
+def last_item_in_tier(value_map):
+    return len(value_map.keys()) == 1 and '_meta' in value_map.keys()
+    # return len(value_map.keys()) <= 2 and ('_full_key' in value_map.keys() and '_tier' in value_map.keys())
+
+def write_contract_block(keys_value, key):
+    contract_block = ''
+    tab = '  '
+    tab_count = 1
+
+    type_block = '{tab}type: object\n{tab}properties:'.format(tab=tab)
+    if key[-1] == 's':
+        type_block = "{tab}type: array\n{tab}items:".format(tab=tab)
+
+    tab_count += 1
+    _tab_count = tab_count
+    timestamp = str(datetime.now().timestamp()).split('.')[0]
+    contract_block += '{key}Object:\n{type_block}\n'.format(
+        key=key, type_block=type_block
+    )
+    _detail_block = ''
+    with open('generated_contract_{0}.yaml'.format(timestamp), 'a') as open_file:
+        if last_item_in_tier(keys_value):
+            value_type = keys_value['_meta'].get('val_type', None)
+            if value_type is None:
+                # print(keys_value)
+                value_type = '===UNKNOWN==='
+            contract_block += '{tab}type: {type}\n'.format(tab=tab, type=value_type)
+        else:
+            for child in keys_value.keys():
+                child_block = '{tab}{child}:\n'.format(child=child, tab=tab*tab_count)
+                # if child[-1] == 's':
+                    # if array
+                    # _detail_block = '{tab}type: array\n{tab}items:\n'.format(tab=tab)
+                    # tab_count += 1
+                contract_block += "{child_block}{tab}$ref: '#/definitions/{child}Object'\n".format(
+                    tab=(tab+1)*tab_count, child=child, child_block=child_block
+                )
+                # contract_block += _detail_block
+        open_file.write(contract_block + '\n')
 
 def get_nested(d, key):
     keys = key.split('.')
@@ -105,12 +151,15 @@ def get_nested(d, key):
             return None
     return val
 
-def update_or_create_nested(d, u):
+def update_or_create_nested(d, u, meta):
+    # {'a': {'b': {'c': {'_tier': 4}, 'tier': 3}, '_tier': 2}, '_tier': 1}
     for k, v in u.items():
         if isinstance(v, collections.Mapping):
-            d[k] = update_or_create_nested(d.get(k, {}), v)
-        else:
-            d[k] = v
+            d[k] = update_or_create_nested(d.get(k, {}), v, meta)
+            # d[k]['_tier'] = tier
+        if v == {}:
+            d[k] = {'_meta': meta}
+            # d[k]['_tier'] = tier
     return d
 
 def create_nested(long_key):
@@ -121,32 +170,8 @@ def create_nested(long_key):
 
 
 if __name__ == '__main__':
-    # import pdb; pdb.set_trace()
     updated_freq_map = read_csv_values()
-    ee = dict_reduce(updated_freq_map)
-    import pdb; pdb.set_trace()
+    new_payload_hierarchy = dict_reduce(updated_freq_map)
+    create_contract(new_payload_hierarchy)
 
-    # calculate tiers
-    # create contract based on tiers.
-    # tier 1 hotelinfo ; pass
-        # tier 2 profiles ; pass
-
-
-
-
-# lookup_val.split('.')
-# output={}
-# # a.b.c.d
-# # b.c.b.a
-# tier = 0
-# for key in keys:
-#     all_vals = lookup_val.split('.')
-#     for tiers in all_vals:
-
-#     else:
-#         tier += 1
-
-
-
-# # e.b.c.f
 
