@@ -6,6 +6,20 @@ import json
 import uuid
 from datetime import datetime
 
+
+# =====
+
+# there needs to be a collection of
+
+# taxes:[]
+# fees:[]
+
+# added to the hcm attribute yaml file
+
+# update the yaml file
+
+# ======
+
 _input_dict = None
 
 DETAIL_MAP = {}
@@ -13,6 +27,7 @@ DETAIL_MAP = {}
 def dict_reduce(input_dict):
     """Reduce a given dict with random elements into one."""
     output = {}
+
     for key in input_dict.keys():
         # {'value': 'Apigee', 'keys_value': 'value', 'val_type': 'string', 'extras': []}
         #  get the actual key name value
@@ -80,10 +95,21 @@ def read_csv_values():
     return updated_freq_map
 
 def create_contract(payload_hierarchy_map):
-    # attributes = payload_hierarchy_map.keys()
+    # {a:{
+    #     b:{e:-,f:-,g:-}
+    #     c:-
+    #     d:-
+    # }}
     for att_k, att_v in payload_hierarchy_map.items():
+        # try:
+        if att_k == '_meta':
+            continue
+        # if last_item_in_tier(att_v):
+            # return
+        # create_contract(att_v)
         create_contract_block(att_v, att_k)
-
+        # except Exception:
+            # import pdb; pdb.set_trace()
 
 def create_contract_block(value_map, key):
     """
@@ -92,56 +118,54 @@ def create_contract_block(value_map, key):
                 type: string
                 $ref: '#definitions/{REFERENCE_OBJ}'
     """
-    if last_item_in_tier(value_map):
-        return write_contract_block(value_map, key)
+    # if last_item_in_tier(value_map):
+        # return
     for k, v in value_map.items():
-        if k and k[0] == '_':
+        if k == '_meta':
             continue
-        # write these into the file block now
-        create_contract_block(v, k)
         if key == '':
             import pdb; pdb.set_trace()
-        write_contract_block(value_map, key)
+        write_contract_block(v, k)
+        create_contract_block(v, k)
+            # write_contract_block(v, k)
+        # write_contract_block()
 
 def last_item_in_tier(value_map):
     return len(value_map.keys()) == 1 and '_meta' in value_map.keys()
     # return len(value_map.keys()) <= 2 and ('_full_key' in value_map.keys() and '_tier' in value_map.keys())
 
 def write_contract_block(keys_value, key):
-    contract_block = ''
+
     tab = '  '
     tab_count = 1
-
     type_block = '{tab}type: object\n{tab}properties:'.format(tab=tab)
-    if key[-1] == 's':
-        type_block = "{tab}type: array\n{tab}items:".format(tab=tab)
-
+    # if key[-1] == 's':
+        # type_block = "{tab}type: array\n{tab}items:".format(tab=tab)
+    contract_block = '{key}Object:\n{type_block}\n'.format(
+        key=key, type_block=type_block
+    )
     tab_count += 1
     _tab_count = tab_count
     timestamp = str(datetime.now().timestamp()).split('.')[0]
-    contract_block += '{key}Object:\n{type_block}\n'.format(
-        key=key, type_block=type_block
-    )
-    _detail_block = ''
     with open('generated_contract_{0}.yaml'.format(timestamp), 'a') as open_file:
+        child_block = ''
         if last_item_in_tier(keys_value):
             value_type = keys_value['_meta'].get('val_type', None)
             if value_type is None:
-                # print(keys_value)
                 value_type = '===UNKNOWN==='
-            contract_block += '{tab}type: {type}\n'.format(tab=tab, type=value_type)
+            contract_block = '{key}Object:\n{tab}type: {type}\n'.format(
+                tab=tab, type=value_type, key=key
+            )
+            # contract_block += '$$ {val}\n'.format(val=keys_value['_meta'].get('keys_value', '===UNKNOWN==='))
         else:
+            # open_file.write(contract_block + '\n')
             for child in keys_value.keys():
-                child_block = '{tab}{child}:\n'.format(child=child, tab=tab*tab_count)
-                # if child[-1] == 's':
-                    # if array
-                    # _detail_block = '{tab}type: array\n{tab}items:\n'.format(tab=tab)
-                    # tab_count += 1
-                contract_block += "{child_block}{tab}$ref: '#/definitions/{child}Object'\n".format(
-                    tab=(tab+1)*tab_count, child=child, child_block=child_block
+                if child == '_meta':
+                    continue
+                child_block += "{tab}{child}:\n{child_tab}$ref: '#/definitions/{child}Object'\n".format(
+                    tab=tab*tab_count, child_tab=tab*(tab_count+1), child=child
                 )
-                # contract_block += _detail_block
-        open_file.write(contract_block + '\n')
+        open_file.write(contract_block + child_block + '\n')
 
 def get_nested(d, key):
     keys = key.split('.')
