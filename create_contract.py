@@ -32,7 +32,10 @@ def dict_reduce(input_dict):
         # {'value': 'Apigee', 'keys_value': 'value', 'val_type': 'string', 'extras': []}
         #  get the actual key name value
         lookup_val = input_dict[key]['long_key']
-        value = lookup_val.split('.')
+        try:
+            value = lookup_val.split('.')
+        except:
+            import pdb;pdb.set_trace()
         if '' in value:
             print('=====EMPTY VALUE IN INPUT DICT')
         if len(value) <= 2:
@@ -51,6 +54,8 @@ def create_hierarchy(output, meta):
     return updated_hierarchy
 
 def get_type(val):
+    if val == None:
+        return '===UNKNOWN==='
     if type(val) == dict:
         val = 'object'
     elif type(val) == list:
@@ -62,7 +67,8 @@ def get_type(val):
     elif type(val) == bool:
         val = 'boolean'
     else:
-        import pdb; pdb.set_trace()
+        val = '===UNKNOWN==='
+        # import pdb; pdb.set_trace()
     return val
 
 def read_csv_values():
@@ -100,16 +106,12 @@ def create_contract(payload_hierarchy_map):
     #     c:-
     #     d:-
     # }}
+    import pdb; pdb.set_trace()
+    write_contract_block(payload_hierarchy_map['hotelinfo'], 'hotelinfo')
     for att_k, att_v in payload_hierarchy_map.items():
-        # try:
         if att_k == '_meta':
             continue
-        # if last_item_in_tier(att_v):
-            # return
-        # create_contract(att_v)
         create_contract_block(att_v, att_k)
-        # except Exception:
-            # import pdb; pdb.set_trace()
 
 def create_contract_block(value_map, key):
     """
@@ -118,29 +120,24 @@ def create_contract_block(value_map, key):
                 type: string
                 $ref: '#definitions/{REFERENCE_OBJ}'
     """
-    # if last_item_in_tier(value_map):
-        # return
     for k, v in value_map.items():
         if k == '_meta':
             continue
-        if key == '':
-            import pdb; pdb.set_trace()
+        if last_item_in_tier(v):
+            continue
         write_contract_block(v, k)
         create_contract_block(v, k)
-            # write_contract_block(v, k)
-        # write_contract_block()
 
 def last_item_in_tier(value_map):
     return len(value_map.keys()) == 1 and '_meta' in value_map.keys()
-    # return len(value_map.keys()) <= 2 and ('_full_key' in value_map.keys() and '_tier' in value_map.keys())
 
 def write_contract_block(keys_value, key):
 
     tab = '  '
     tab_count = 1
     type_block = '{tab}type: object\n{tab}properties:'.format(tab=tab)
-    # if key[-1] == 's':
-        # type_block = "{tab}type: array\n{tab}items:".format(tab=tab)
+    if key[-1] == 's':
+        type_block = "{tab}type: array\n{tab}items:".format(tab=tab)
     contract_block = '{key}Object:\n{type_block}\n'.format(
         key=key, type_block=type_block
     )
@@ -151,20 +148,20 @@ def write_contract_block(keys_value, key):
         child_block = ''
         if last_item_in_tier(keys_value):
             value_type = keys_value['_meta'].get('val_type', None)
-            if value_type is None:
-                value_type = '===UNKNOWN==='
             contract_block = '{key}Object:\n{tab}type: {type}\n'.format(
                 tab=tab, type=value_type, key=key
             )
-            # contract_block += '$$ {val}\n'.format(val=keys_value['_meta'].get('keys_value', '===UNKNOWN==='))
         else:
-            # open_file.write(contract_block + '\n')
             for child in keys_value.keys():
                 if child == '_meta':
                     continue
-                child_block += "{tab}{child}:\n{child_tab}$ref: '#/definitions/{child}Object'\n".format(
-                    tab=tab*tab_count, child_tab=tab*(tab_count+1), child=child
-                )
+                if last_item_in_tier(keys_value[child]):
+                    child_block += "{tab}{child}:\n{child_tab}type: {type}\n".format(
+                        tab=tab*tab_count, child=child, type=keys_value[child]['_meta']['val_type'], child_tab=tab*(tab_count+1))
+                else:
+                    child_block += "{tab}{child}:\n{child_tab}$ref: '#/definitions/{child}Object'\n".format(
+                        tab=tab*tab_count, child_tab=tab*(tab_count+1), child=child
+                    )
         open_file.write(contract_block + child_block + '\n')
 
 def get_nested(d, key):
@@ -190,12 +187,42 @@ def create_nested(long_key):
      # {'a': {'b': {'c': {}}}}
     if len(long_key) == 0:
         return {}
-    return {long_key[0].lower():create_nested(long_key[1:])}
+    return { long_key[0].lower(): create_nested(long_key[1:]) }
 
+def write_payload_hierarchy(payload_map):
+    with open('payload_map.json', 'w') as open_file:
+        open_file.write(str(payload_map))
+
+def change_facilities(pp_map):
+    o = {}
+    for k, v in pp_map.items():
+        if (
+            'facilities' in [e.lower() for e in v['long_key'].split('.')] or
+            'facilities' in [e.lower() for e in k.split('.')]
+        ):
+            ke = []
+            for e in k.split('.'):
+                if e.lower() == 'hotelcontent':
+                    e = 'hotelInfo'
+                if e.lower() == 'facilities':
+                    continue
+                if e.lower() == 'hotelfacilities':
+                    e = 'facilities'
+                if e.lower() == 'value':
+                    continue
+                ke.append(e)
+            v['long_key'] = '.'.join(ke)
+        o[k] = v
+    with open('NEW_facilities_map.json', 'w') as open_file:
+        open_file.write(str(o))
+    return o
 
 if __name__ == '__main__':
     updated_freq_map = read_csv_values()
+    # import pdb; pdb.set_trace()
+    updated_freq_map = change_facilities(updated_freq_map)
     new_payload_hierarchy = dict_reduce(updated_freq_map)
+    write_payload_hierarchy(new_payload_hierarchy)
     create_contract(new_payload_hierarchy)
 
 
