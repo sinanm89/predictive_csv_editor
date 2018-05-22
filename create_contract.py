@@ -1,7 +1,8 @@
 import csv
 import collections
 from reader import read_the_csv_files, list_all_files
-from _FIXED_attribute_map import prev_freq_map as FREQ_MAP
+# from _FIXED_attribute_map import prev_freq_map as FREQ_MAP
+from mobile_first_pass_map import prev_freq_map as FREQ_MAP
 import json
 import uuid
 from datetime import datetime
