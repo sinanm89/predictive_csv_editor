@@ -1,0 +1,1032 @@
+HotelDetails:
+    type: object
+    properties:
+      location:
+        $ref: '#/definitions/Location'
+      contact:
+        $ref: '#/definitions/Contact'
+      reviews:
+        $ref: '#/definitions/Reviews'
+      profile:
+        $ref: '#/definitions/profileObject'
+      marketing:
+        $ref: '#/definitions/Marketing'
+      address:
+        $ref: '#/definitions/Address'
+      policies:
+        $ref: '#/definitions/policiesObject'
+      media:
+        $ref: '#/definitions/mediaObject'
+      facilities:
+        $ref: '#/definitions/facilitiesObject'
+      badges:
+        $ref: '#/definitions/badgesObject'
+      safetyandaccessibility:
+        $ref: '#/definitions/safetyandaccessibilityObject'
+      technology:
+        $ref: '#/definitions/technologyObject'
+
+profileObject:
+  type: object
+  properties:
+    paymentmethods:
+      $ref: '#/definitions/paymentmethodsObject'
+    languagesspokenbystaff:
+      type: string
+    staypreferenceparticipation:
+      type: string
+
+paymentmethodsObject:
+  type: array
+  items:
+    creditcardsaccepted:
+      type: string
+
+technologyObject:
+  type: object
+  properties:
+    guestRequestsVendorName:
+      type: string
+    pointofSaleVendorName:
+      type: string
+    digitalroomservice:
+      type: string
+    grubhubmarket:
+      type: string
+    webConfig:
+      type: object
+      properties:
+        priceCompare:
+          description: Shows the Trip Tease price comparison based on this indicator
+          type: object
+          properties:
+            listItem:
+              type: array
+              description: Shows the Trip Tease price comparison indicator per page
+              items:
+                type: string
+
+Policies:
+    type: object
+    properties:
+      checkinTime:
+        type: string
+        description: earliest checkin time
+      checkoutTime:
+        type: string
+        description: earliest checkout time
+      acceptedCurrencies:
+        $ref: '#/definitions/Currencies'
+      pets:
+        $ref: '#/definitions/petsObject'
+      barloungedetail:
+        type: string
+      roomservice:
+        type: string
+      weaponsPolicy:
+        type: boolean
+      currencyDisclaimer:
+        type: string
+        description: Currency disclaimer to explain how the exchange rate and inflation would affect a booking for this hotel.
+      serviceChargeDetail:
+        type: object
+        properties:
+          description:
+            type: string
+            description: Service Charge disclaimer description to explain the extra charges for this hotel.
+
+petsObject:
+  type: array
+  items:
+    petsallowed:
+      type: string
+    guidedogsorserviceanimalsallowed:
+      type: string
+    depositperstay:
+      type: string
+    feepernight:
+      type: string
+    description:
+      type: string
+    petwalkingarea:
+      type: string
+
+  Currencies:
+    type: array
+    items:
+      $ref: '#/definitions/Currency'
+  Currency:
+    type: object
+    properties:
+      code:
+        type: string
+        description: The currency code
+      name:
+        type: string
+        description: The currency name
+      symbol:
+        type: string
+        description: The currency symbol
+
+mediaObject:
+  type: object
+  properties:
+    welcomephotos:
+      $ref: '#/definitions/welcomephotosObject'
+    roomphotos:
+      $ref: '#/definitions/roomphotosObject'
+    amenityphotos:
+      $ref: '#/definitions/amenityphotosObject'
+    diningimages:
+      type: string
+    groupsandmeetingsphotos:
+      $ref: '#/definitions/groupsandmeetingsphotosObject'
+    roomvirtualtours:
+      type: string
+    primaryphotos:
+      type: string
+    videos:
+      $ref: '#/definitions/videosObject'
+    diningphotos:
+      $ref: '#/definitions/diningphotosObject'
+    conciergevideo:
+      $ref: '#/definitions/conciergevideoObject'
+    icdestinationphotos:
+      $ref: '#/definitions/icdestinationphotosObject'
+    requests:
+      type: string
+    diningvirtualimages:
+      type: string
+    amenityvirtualimages:
+      type: string
+    areaattractionphoto:
+      type: string
+
+welcomephotosObject:
+  type: array
+  items:
+    hotelexteriorphoto:
+      type: string
+
+roomphotosObject:
+  type: array
+  items:
+    guestroomphoto:
+      type: string
+    suitephoto:
+      type: string
+    kingbedguestroomphoto:
+      type: string
+    clubfloorroomphoto:
+      type: string
+    guestroomsimages:
+      type: string
+    guestroomsvirtualimages:
+      type: string
+
+amenityphotosObject:
+  type: array
+  items:
+    fitnesscenterphoto:
+      type: string
+
+groupsandmeetingsphotosObject:
+  type: array
+  items:
+    meetingroomphoto:
+      type: string
+    ballroomphoto:
+      type: string
+    meetingimages:
+      type: string
+    meetingvirtualimages:
+      type: string
+
+videosObject:
+  type: array
+  items:
+    customvideo:
+      $ref: '#/definitions/customvideoObject'
+
+diningphotosObject:
+  type: array
+  items:
+    barandloungephoto:
+      type: string
+    restaurantphoto:
+      type: string
+    finediningphoto:
+      type: string
+
+
+conciergevideoObject:
+  type: object
+  properties:
+    mainvideo:
+      $ref: '#/definitions/mainvideoObject'
+
+mainvideoObject:
+  type: object
+  properties:
+    file:
+      $ref: '#/definitions/fileObject'
+
+fileObject:
+  type: object
+  properties:
+    url:
+      type: string
+
+icdestinationphotosObject:
+  type: array
+  items:
+    exterior:
+      $ref: '#/definitions/exteriorObject'
+    destinationinterior:
+      $ref: '#/definitions/destinationinteriorObject'
+    interior:
+      $ref: '#/definitions/interiorObject'
+    insiderknowledge:
+      $ref: '#/definitions/insiderknowledgeObject'
+    atyourside:
+      $ref: '#/definitions/atyoursideObject'
+    welcome1:
+      $ref: '#/definitions/welcomeObject'
+    welcome2:
+      $ref: '#/definitions/welcomeObject'
+    welcomeimages:
+      type: string
+    welcomevirtualimages:
+      type: string
+
+welcomeObject:
+  type: object
+  properties:
+    image:
+      $ref: '#/definitions/imageObject'
+    caption:
+      type: string
+
+atyoursideObject:
+  type: object
+  properties:
+    image:
+      $ref: '#/definitions/imageObject'
+    caption:
+      type: string
+
+insiderknowledgeObject:
+  type: object
+  properties:
+    image:
+      $ref: '#/definitions/imageObject'
+    caption:
+      type: string
+
+destinationinteriorObject:
+  type: object
+  properties:
+    image:
+      $ref: '#/definitions/imageObject'
+    caption:
+      type: string
+
+exteriorObject:
+  type: object
+  properties:
+    image:
+      $ref: '#/definitions/imageObject'
+    caption:
+      type: string
+
+imageObject:
+  type: object
+  properties:
+    formats:
+      $ref: '#/definitions/formatsObject'
+
+formatsObject:
+  type: array
+  items:
+    format:
+      type: string
+
+badgesObject:
+  type: array
+  items:
+    premiumwiredinternetavailable:
+      type: string
+    complimentarypremiumwiredinternetforelitemembers:
+      type: string
+    complimentarypremiumwiredinternetforallmembers:
+      type: string
+    complimentarystandardwiredinternetforelitemembers:
+      type: string
+    complimentarystandardwiredinternetforallmembers:
+      type: string
+    complimentarystandardwirelessforelitemembers:
+      type: string
+    premiumwirelessinternetavailable:
+      type: string
+    complimentarypremiumwirelessinternetforelitemembers:
+      type: string
+    complimentarypremiumwirelessinternetforallmembers:
+      type: string
+
+facilitiesObject:
+  type: array
+  items:
+    rooms:
+      $ref: '#/definitions/roomsObject'
+    parking:
+      $ref: '#/definitions/parkingObject'
+    valetparkingavailable:
+      type: string
+    chargeforparking:
+      type: string
+    attractionsandrecreation:
+      $ref: '#/definitions/attractionsandrecreationObject'
+    adaaccessibleselfparkingavailable:
+      type: string
+    vanaccessibleparkinginselfparking:
+      type: string
+    complimentaryaccessibletransportationwithadvancednotice:
+      type: string
+    designatedaccessibleparkingspaceswithpostsigns:
+      type: string
+    flatterrainbetweenparkingandentrance:
+      type: string
+    hotelentranceisadaaccessible:
+      type: string
+    entrancesordoorsareadaaccessiblewithbeveledorflushthresholds:
+      type: string
+    routefromaccessiblepublicentrancetoregistrationareaaccessible:
+      type: string
+    publicrestroomsstallsarewheelchairaccessible:
+      type: string
+    conciergedeskadawheelchairaccessible:
+      type: string
+    hotelrestaurantadawheelchairaccessible:
+      type: string
+    exercisefacilityadawheelchairaccessible:
+      type: string
+    businesscenteradawheelchairaccessible:
+      type: string
+    registrationdeskadawheelchairaccessible:
+      type: string
+    publicrestroomsarewheelchairaccessible:
+      type: string
+    hotelentranceiswheelchairaccessible:
+      type: string
+    elevatorwheelchairaccessible:
+      type: string
+    guestroomwheelchairaccessiblerooms:
+      type: string
+    pooladawheelchairaccessible:
+      type: string
+    routefromaccessiblepublicentrancetobusinesscenteraccessible:
+      type: string
+    routefromaccessibleentrancetomeetingballroomareaisaccessible:
+      type: string
+    routefromaccessiblepublicentrancetoexercisefacilityaccessible:
+      type: string
+    routefromaccessiblepublicentrancetopoolaccessible:
+      type: string
+    wheelchairelevatoraccesstoalllevels:
+      type: string
+    wheelchairelevatoraccessibilityadacompliant:
+      type: string
+    wheelchairelevatornearaccessiblerooms:
+      type: string
+    guestroomsandaccessroutesareadaaccessible:
+      type: string
+    alldoorlocksandhardwareareadaaccessible:
+      type: string
+    controlsforheatingairconditionerlightsarewheelchairaccessible:
+      type: string
+    wheelchairguestroomaccessibilityfurniturerearrangeable:
+      type: string
+    wheelchairguestroomemergencycordorbuttoninbathrooms:
+      type: string
+    wheelchairguestroomemergencycordorbuttoninbedrooms:
+      type: string
+    wheelchairguestroomgrabbarswithspaceandtailtoilets:
+      type: string
+    wheelchairguestroombathroomwithclearturningspace:
+      type: string
+    wheelchairbathroomtubwithgrabbarsontwoadjacentwalls:
+      type: string
+    wheelchairbathroomportablebathtubseats:
+      type: string
+    wheelchairbathroombathtubseat:
+      type: string
+    wheelchairbathroomshowerswithhandheldshowerorhose:
+      type: string
+    wheelchairbathroomshowerswithbuiltintransfershowerseats:
+      type: string
+    wheelchairbathroomhandrails:
+      type: string
+    wheelchairbathroomrollinshowers:
+      type: string
+    wheelchairbathroomraisedtoiletwithgrabbars:
+      type: string
+    wheelchairbathroomsafetybar:
+      type: string
+    wheelchairbathroomdoorsopenoutwardinaccessiblerooms:
+      type: string
+    wheelchairbathroomaccessiblebathroomcontrols:
+      type: string
+    wheelchairaccessibilitydetails:
+      type: string
+    wheelchairavailable:
+      type: string
+    curbcutsandstreetparkingwheelchairaccessible:
+      type: string
+    closetswheelchairaccessible:
+      type: string
+    guestroomsandaccessroutesarewheelchairaccessible:
+      type: string
+    guestroomplumbingispaddedwithclearancebeneathvanity:
+      type: string
+    adaaccessiblerooms:
+      type: string
+    elevatoraccessibilitydetails:
+      type: string
+    routefromaccessiblepublicentrancetorestaurantaccessible:
+      type: string
+    publicrestroomsplumbingispaddedwithclearancebeneathvanity:
+      type: string
+    publicareaaccessibilitydetails:
+      $ref: '#/definitions/publicareaaccessibilitydetailsObject'
+    accessiblefacilitiesinpublicareas:
+      type: string
+    routefromaccessiblepublicentrancetospaaccessible:
+      type: string
+    wirelessinternet:
+      type: string
+    guestservices:
+      $ref: '#/definitions/guestservicesObject'
+    emailandinternet:
+      type: string
+    guesthighspeedinternetaccess:
+      type: string
+    languagedetailsmultiplelanguages:
+      type: string
+    restaurant:
+      $ref: '#/definitions/restaurantObject'
+    barandlounge:
+      $ref: '#/definitions/barandloungeObject'
+    barandloungecocktaillounge:
+      type: string
+    barandloungechampagnebar:
+      type: string
+    barandloungelounge24hrs:
+      type: string
+    winetastingonsiteind:
+      type: string
+    nightclubonsiteind:
+      type: string
+    barandloungededicatedlounge:
+      type: string
+    foodandbeverage:
+      $ref: '#/definitions/foodandbeverageObject'
+    publicareas:
+      $ref: '#/definitions/publicareasObject'
+
+publicareasObject:
+  type: array
+  items:
+    barbequegrills:
+      type: string
+
+foodandbeverageObject:
+  type: object
+  properties:
+    complimentarybreakfastbuffet:
+      type: string
+    complimentarycoffeeinlobby:
+      type: string
+    complimentarybreakfastdetails:
+      $ref: '#/definitions/complimentarybreakfastdetailsObject'
+    eveningreceptiondetails:
+      $ref: '#/definitions/eveningreceptiondetailsObject'
+
+complimentarybreakfastdetailsObject:
+  type: array
+  items:
+    complimentaryfullbreakfast:
+      $ref: '#/definitions/complimentaryfullbreakfastObject'
+    complimentarycontibreakfast:
+      $ref: '#/definitions/complimentarycontibreakfastObject'
+    complimentarybreakfastbuffet:
+      $ref: '#/definitions/complimentarybreakfastbuffetObject'
+    complimentarybreakfasthoursofoperation:
+      $ref: '#/definitions/complimentarybreakfasthoursofoperationObject'
+
+complimentaryfullbreakfastObject:
+  type: object
+  properties:
+    executiverooms:
+      type: string
+    suites:
+      type: string
+    standardrooms:
+      type: string
+
+complimentarycontibreakfastObject:
+  type: object
+  properties:
+    executiverooms:
+      type: string
+    suites:
+      type: string
+    standardrooms:
+      type: string
+
+complimentarybreakfastbuffetObject:
+  type: object
+  properties:
+    executiverooms:
+      type: string
+    suites:
+      type: string
+    standardrooms:
+      type: string
+
+complimentarybreakfasthoursofoperationObject:
+  type: object
+  properties:
+    hoursto:
+      type: string
+    hoursfrom:
+      type: string
+
+barandloungeObject:
+  type: object
+  properties:
+    menupdf:
+      type: string
+    liveentertainmentavailable:
+      type: string
+    name:
+      type: string
+    location:
+      type: string
+    operation:
+      $ref: '#/definitions/operationObject'
+    phonenumber:
+      type: string
+
+operation2Object:
+  type: object
+  properties:
+    hoursto:
+      type: string
+    hoursfrom:
+      type: string
+
+
+restaurantObject:
+  type: object
+  properties:
+    opentableapikey:
+      type: string
+    onsiterestaurantscount:
+      type: string
+    operation:
+      $ref: '#/definitions/operationObject'
+    roomservicemenupdf:
+      type: string
+    restaurantmenupdf:
+      type: string
+    roomservicedetails:
+      $ref: '#/definitions/roomservicedetailsObject'
+    restaurantdetails:
+      $ref: '#/definitions/restaurantdetailsObject'
+    name:
+      type: string
+    cuisinetype:
+      type: string
+    phonenumber:
+      type: string
+    address:
+      type: string
+    location:
+      type: string
+
+operationObject:
+  type: object
+  properties:
+    hoursfrom:
+      type: string
+    hoursto:
+      type: string
+    daysofweekopen:
+      type: string
+
+roomservicedetailsObject:
+  type: array
+  items:
+    hoursofoperation:
+      $ref: '#/definitions/hoursofoperationObject'
+    fullorlimitedmenu:
+      type: string
+    menu:
+      $ref: '#/definitions/menuObject'
+    roomservice:
+      $ref: '#/definitions/roomserviceObject'
+
+hoursofoperationObject:
+  type: object
+  properties:
+    hoursfrom:
+      type: string
+    hoursto:
+      type: string
+
+menuObject:
+  type: object
+  properties:
+    url:
+      type: string
+
+roomserviceObject:
+  type: object
+  properties:
+    executiverooms:
+      type: string
+    suites:
+      type: string
+    standardrooms:
+      type: string
+
+restaurantdetailsObject:
+  type: array
+  items:
+    restaurantdetail:
+      $ref: '#/definitions/restaurantdetailObject'
+
+restaurantdetailObject:
+  type: object
+  properties:
+    name:
+      type: string
+
+publicareaaccessibilitydetailsObject:
+  type: array
+  items:
+    onsiterestaurantshaveseatingavailableforwheelchairs:
+      type: string
+
+guestservicesObject:
+  type: array
+  items:
+    internetservices:
+      $ref: '#/definitions/internetservicesObject'
+    staffassistedservices:
+      $ref: '#/definitions/staffassistedservicesObject'
+
+internetservicesObject:
+  type: array
+  items:
+    wirelessinternetlocations:
+      $ref: '#/definitions/wirelessinternetlocationsObject'
+    highspeedinternetlocations:
+      $ref: '#/definitions/highspeedinternetlocationsObject'
+    wiredhighspeedinternetaccessdetails:
+      type: string
+    wirelesshighspeedinternetaccessdetails:
+      type: string
+    premiuminternetfee:
+      type: string
+    internetbrowserontvlocations:
+      $ref: '#/definitions/internetbrowserontvlocationsObject'
+
+wirelessinternetlocationsObject:
+  type: array
+  items:
+    standardroomavailable:
+      type: string
+    executiveroomavailable:
+      type: string
+    suiteavailable:
+      type: string
+    businesscenteravailable:
+      type: string
+    meetingspaceavailable:
+      type: string
+    publicspaceavailable:
+      type: string
+    standardroomfee:
+      type: string
+
+highspeedinternetlocationsObject:
+  type: array
+  items:
+    standardroomavailable:
+      type: string
+    executiveroomavailable:
+      type: string
+    suiteavailable:
+      type: string
+    businesscenteravailable:
+      type: string
+    meetingspaceavailable:
+      type: string
+    publicspaceavailable:
+      type: string
+    standardroomfee:
+      type: string
+
+internetbrowserontvlocationsObject:
+  type: array
+  items:
+    standardroomavailable:
+      type: string
+    suiteavailable:
+      type: string
+
+
+staffassistedservicesObject:
+  type: array
+  items:
+    languagedetails:
+      $ref: '#/definitions/languagedetailsObject'
+
+languagedetailsObject:
+  type: array
+  items:
+    languages:
+      type: string
+
+roomsObject:
+  type: array
+  items:
+    hotelhighlights:
+      $ref: '#/definitions/hotelhighlightsObject'
+
+hotelhighlightsObject:
+  type: array
+  items:
+    buildingdetails:
+      $ref: '#/definitions/buildingdetailsObject'
+
+buildingdetailsObject:
+  type: array
+  items:
+    numberofguestrooms:
+      type: string
+    numberoffloors:
+      type: string
+    numberofsuites:
+      type: string
+    numberofnonsmokingrooms:
+      type: string
+
+parkingObject:
+  type: object
+  properties:
+    carparkingavailable:
+      type: string
+    dailyvaletparkingfee:
+      type: string
+    parkingdescription:
+      type: string
+    numberofparkingspaces:
+      type: string
+    dailyselfparkingfee:
+      type: string
+    complimentarydailyselfparking:
+      type: string
+
+attractionsandrecreationObject:
+  type: object
+  properties:
+    corporatelocation:
+      $ref: '#/definitions/corporatelocationObject'
+    attractions:
+      $ref: '#/definitions/attractionsObject'
+    outdoorrecreation:
+      $ref: '#/definitions/outdoorrecreationObject'
+    indoorrecreation:
+      $ref: '#/definitions/indoorrecreationObject'
+    waterrecreation:
+      $ref: '#/definitions/waterrecreationObject'
+    otherattractions:
+      $ref: '#/definitions/otherattractionsObject'
+    indoorrecreationtabletennisonsiteind:
+      type: string
+    indoorrecreationindoortenniscourtsonsiteind:
+      type: string
+    indoorrecreatiobilliardsonsiteind:
+      type: string
+    indoorrecreationbowlingonsiteind:
+      type: string
+    indooriceskatingonsiteind:
+      type: string
+    indoorrollerskating:
+      type: string
+    indoorrecreationracquetball:
+      type: string
+    tanningbedsonsiteind:
+      type: string
+
+waterrecreationObject:
+  type: object
+  properties:
+    fishing:
+      type: string
+    jetskiing:
+      type: string
+    boatingorsailing:
+      type: string
+    scubadiving:
+      type: string
+    waterskiing:
+      type: string
+    swimming:
+      type: string
+    snorkeling:
+      type: string
+    surfing:
+      type: string
+
+otherattractionsObject:
+  type: array
+  items:
+    librarydetails:
+      $ref: '#/definitions/librarydetailsObject'
+    worshiplocations:
+      $ref: '#/definitions/worshiplocationsObject'
+    attractiondetails:
+      $ref: '#/definitions/attractiondetailsObject'
+
+librarydetailsObject:
+  type: array
+  items:
+    librarydetail:
+      type: string
+
+attractiondetailsObject:
+  type: array
+  items:
+    attractiondetail:
+      type: string
+
+corporatelocationObject:
+  type: object
+  properties:
+    corporationdetails:
+      $ref: '#/definitions/corporationdetailsObject'
+
+corporationdetailsObject:
+  type: array
+  items:
+    corporationdetail:
+      type: string
+
+attractionsObject:
+  type: array
+  items:
+    sightseeingtours:
+      type: string
+    museumorgallery:
+      type: string
+    racetrackdetails:
+      $ref: '#/definitions/racetrackdetailsObject'
+    zoooraquariumdetails:
+      $ref: '#/definitions/zoooraquariumdetailsObject'
+    sportsvenuedetails:
+      $ref: '#/definitions/sportsvenuedetailsObject'
+    themeparkdetails:
+      $ref: '#/definitions/themeparkdetailsObject'
+    collegeoruniversitydetails:
+      $ref: '#/definitions/collegeoruniversitydetailsObject'
+
+acetrackdetailsObject:
+  type: array
+  items:
+    racetrackdetail:
+      type: string
+
+zoooraquariumdetailsObject:
+  type: array
+  items:
+    zoooraquariumdetail:
+      type: string
+
+sportsvenuedetailsObject:
+  type: array
+  items:
+    sportsvenuedetail:
+      type: string
+
+themeparkdetailsObject:
+  type: array
+  items:
+    themeparkdetail:
+      type: string
+
+collegeoruniversitydetailsObject:
+  type: array
+  items:
+    collegeoruniversitydetail:
+      type: string
+
+outdoorrecreationObject:
+  type: object
+  properties:
+    parkdetails:
+      $ref: '#/definitions/parkdetailsObject'
+    movietheaterdetails:
+      $ref: '#/definitions/movietheaterdetailsObject'
+    basketball:
+      type: string
+    bicycling:
+      type: string
+    joggingtrack:
+      type: string
+    baseball:
+      type: string
+    archery:
+      type: string
+    badminton:
+      type: string
+    mountainorrockwallclimbing:
+      type: string
+    hunting:
+      type: string
+    volleyball:
+      type: string
+    outdooriceskating:
+      type: string
+    outdoorrollerskating:
+      type: string
+    snowskiing:
+      type: string
+    miniaturegolf:
+      type: string
+    soccer:
+      type: string
+    americanfootball:
+      type: string
+    hiking:
+      type: string
+    squash:
+      type: string
+    horsebackriding:
+      type: string
+    racquetball:
+      type: string
+    outdoortenniscourts:
+      $ref: '#/definitions/outdoortenniscourtsObject'
+    golfcoursedetails:
+      type: string
+    cricket:
+      type: string
+
+parkdetailsObject:
+  type: array
+  items:
+    parkdetail:
+      type: string
+
+movietheaterdetailsObject:
+  type: array
+  items:
+    movietheaterdetail:
+      type: string
+
+outdoortenniscourtsObject:
+  type: array
+  items:
+    distance:
+      type: string
+
+indoorrecreationObject:
+  type: object
+  properties:
+    activitiesdescription:
+      type: string
+    billiards:
+      type: string
+    bowling:
+      type: string
+    indooriceskating:
+      type: string
+    indoorrollerskating:
+      type: string
+    racquetball:
+      type: string
+    tabletennis:
+      type: string
+    indoortenniscourts:
+      $ref: '#/definitions/indoortenniscourtsObject'
+    tanningbeds:
+      type: string
+
+indoortenniscourtsObject:
+  type: array
+  items:
+    distance:
+      type: string

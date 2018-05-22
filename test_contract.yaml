@@ -1,0 +1,1778 @@
+---
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Hotel Information
+  description: |
+    Provides the information about a hotel such as address, location, profile, contact information, reviews etc
+basePath: /hotels/v1
+host: int-api.ihg.com
+schemes:
+  - https
+produces:
+  - application/json
+paths:
+  /profiles/{hotelMnemonic}/details/:
+    get:
+      description:
+          <h1>Service Metadata</h1>
+          <b>Service Level Agreement (SLA) between ESB and Apigee</b>
+          <ul>
+            <li>Average Supported Transactions Per Hour - 150000</li>
+            <li>Peak Supported Transactions Per Hour - 250000</li>
+            <li>Average Response Time - 50 milliseconds</li>
+          </ul>
+          <b>Testability Requirements</b>
+          <ul>
+            <li>Virtualized? No</li>
+          </ul>
+      parameters:
+        - name: hotelMnemonic
+          in: path
+          description: The hotel mnemonic for which you need the details
+          type: string
+          required: true
+        - name: fieldset
+          in: query
+          description: |
+            A comma separated list of query parameters representing individual slices. Not all consumers may want to
+            retrieve all parts of the hotel information. Pre-defined slices easily let you retrieve specific parts of
+            the hotel information in the response. If left empty, all the hotel information will be returned. Slice
+            names are case insensitive.
+            Valid slices are -
+             brandInfo,
+             location,
+             contact,
+             reviews,
+             profile,
+             address,
+             media,
+             policies,
+             badges,
+             facilities,
+             technology,
+             marketing
+          type: string
+          required: false
+        - $ref: '#/parameters/LanguageHeader'
+      responses:
+        200:
+          description: Successful Response
+          schema:
+            $ref: '#/definitions/HotelDetails'
+        206:
+          description: Successful, but partial Response
+          schema:
+            $ref: '#/definitions/HotelDetails'
+        400:
+          description: Bad Request. Required parameters are not passed. Invalid slices are passsed.
+          schema:
+            $ref: '#/definitions/Errors'
+        404:
+          description: No hotel information found with the given mnemonic.Invalid Mnemonic. Mnemonic does not exist.
+          schema:
+            $ref: '#/definitions/Errors'
+        407:
+          description: Proxy authentication required
+          schema:
+            $ref: '#/definitions/Errors'
+        429:
+          description: Too many requests
+          schema:
+            $ref: '#/definitions/Errors'
+        500:
+          description: Internal Server error while processing request
+          schema:
+            $ref: '#/definitions/Errors'
+        default:
+          description: Unknown error
+          schema:
+            $ref: '#/definitions/Errors'
+      security:
+        - ApiKey: []
+  /profiles/{hotelMnemonic}/reviews/:
+    get:
+      description:
+          <h1>Service Metadata</h1>
+          <b>Service Level Agreement (SLA)</b>
+          <ul>
+            <li>Average Supported Transactions Per Hour - 150000</li>
+            <li>Peak Supported Transactions Per Hour - 250000</li>
+            <li>Average Response Time - 50 milliseconds</li>
+          </ul>
+          <b>Testability Requirements</b>
+          <ul>
+            <li>Virtualized? No</li>
+          </ul>
+      parameters:
+        - name: hotelMnemonic
+          in: path
+          description: The hotel mnemonic for which you need the details
+          type: string
+          required: true
+        - name: hotelReviewsLimit
+          in: query
+          description: The maximum number of reviews you need in the response
+          type: integer
+          required: false
+          default: 10
+        - name: minimumReviewRating
+          in: query
+          description: The minimum rating that you want to see reviews for. Ratings range from 1-5 ...  1 being the lowest
+          type: integer
+          required: false
+          default: 3
+        - $ref: '#/parameters/LanguageHeader'
+      responses:
+        200:
+          description: Successful Response
+          schema:
+            $ref: '#/definitions/Reviews'
+        400:
+          description: Bad Request. Required parameters are not passed. Invalid slices are passsed.
+          schema:
+            $ref: '#/definitions/Errors'
+        404:
+          description: No hotel information found with the given mnemonic.Invalid Mnemonic. Mnemonic does not exist.
+          schema:
+            $ref: '#/definitions/Errors'
+        407:
+          description: Proxy authentication required
+          schema:
+            $ref: '#/definitions/Errors'
+        429:
+          description: Too many requests
+          schema:
+            $ref: '#/definitions/Errors'
+        500:
+          description: Internal Server error while processing request
+          schema:
+            $ref: '#/definitions/Errors'
+        default:
+          description: Unknown error
+          schema:
+            $ref: '#/definitions/Errors'
+      security:
+        - ApiKey: []
+  /profiles/{hotelMnemonic}/media/{categoryName}:
+    get:
+      description:
+          <h1>Service Metadata</h1>
+          <b>Service Level Agreement (SLA)</b>
+          <ul>
+            <li>Average Supported Transactions Per Hour - 250000</li>
+            <li>Peak Supported Transactions Per Hour - 400000</li>
+            <li>Average Response Time - 50 milliseconds</li>
+          </ul>
+          <b>Testability Requirements</b>
+          <ul>
+            <li>Virtualized? No</li>
+          </ul>
+      parameters:
+        - name: hotelMnemonic
+          in: path
+          description: The hotel mnemonic for which you need the details
+          type: string
+          required: true
+        - name: categoryName
+          in: path
+          description: The category name for which you need image urls for
+          type: string
+          required: true
+        - $ref: '#/parameters/LanguageHeader'
+        - name: User-Agent
+          in: header
+          description: User agent information that is used to send images of appropriate sizes
+          default: en-US
+          required: false
+          type: string
+      responses:
+        200:
+          description: Successful Response
+          schema:
+            $ref: '#/definitions/Media'
+        400:
+          description: Bad Request. Required parameters are not passed. Invalid slices are passsed.
+          schema:
+            $ref: '#/definitions/Errors'
+        404:
+          description: No hotel information found with the given mnemonic.Invalid Mnemonic. Mnemonic does not exist.
+          schema:
+            $ref: '#/definitions/Errors'
+        407:
+          description: Proxy authentication required
+          schema:
+            $ref: '#/definitions/Errors'
+        429:
+          description: Too many requests
+          schema:
+            $ref: '#/definitions/Errors'
+        500:
+          description: Internal Server error while processing request
+          schema:
+            $ref: '#/definitions/Errors'
+        default:
+          description: Unknown error
+          schema:
+            $ref: '#/definitions/Errors'
+      security:
+        - ApiKey: []
+  /preferences/{preferenceType}:
+    get:
+      description:
+          <h1>Service Metadata</h1>
+          <b>Service Level Agreement (SLA)</b>
+          <ul>
+            <li>Average Supported Transactions Per Hour - 300000</li>
+            <li>Peak Supported Transactions Per Hour - 500000</li>
+            <li>Average Response Time - 10 milliseconds</li>
+          </ul>
+          <b>Testability Requirements</b>
+          <ul>
+            <li>Virtualized? No</li>
+          </ul>
+      parameters:
+        - name: preferenceType
+          in: path
+          description: The preference type.
+          type: string
+          required: true
+          enum:
+            - smoking
+            - room
+            - ameneties
+            - brands
+        - $ref: '#/parameters/LanguageHeader'
+      responses:
+        200:
+          description: Successful Response
+          schema:
+            $ref: '#/definitions/Preferences'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Errors'
+        404:
+          description: No filter list found for the filterType provided
+          schema:
+            $ref: '#/definitions/Errors'
+        407:
+          description: Proxy authentication required
+          schema:
+            $ref: '#/definitions/Errors'
+        429:
+          description: Too many requests
+          schema:
+            $ref: '#/definitions/Errors'
+        500:
+          description: Internal Server error while processing request
+          schema:
+            $ref: '#/definitions/Errors'
+        default:
+          description: Unknown error
+          schema:
+            $ref: '#/definitions/Errors'
+      security:
+        - ApiKey: []
+  /ids:
+    get:
+      summary: Gets all hotel codes for hotels existing in reservation system
+      operationId: getHotelCodesListedInHolidex
+      description: ''
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: An array of hotel profiles
+          schema:
+            type: array
+            items:
+              type: string
+        '407':
+          description: Proxy authentication required
+          schema:
+            $ref: '#/definitions/Errors'
+        '422':
+          description: Request didn't pass validation
+          schema:
+            $ref: '#/definitions/Errors'
+        '429':
+          description: Too many requests
+          schema:
+            $ref: '#/definitions/Errors'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Errors'
+      security:
+        - ApiKey: []
+definitions:
+  HotelDetails:
+    type: object
+    properties:
+      profile:
+        $ref: '#/definitions/profileObject'
+      location:
+        $ref: '#/definitions/Location'
+      contact:
+        $ref: '#/definitions/Contact'
+      reviews:
+        $ref: '#/definitions/Reviews'
+      profile:
+        $ref: '#/definitions/Profile'
+      marketing:
+        $ref: '#/definitions/Marketing'
+      address:
+        $ref: '#/definitions/Address'
+      policies:
+        $ref: '#/definitions/Policies'
+      media:
+        $ref: '#/definitions/media'
+      facilities:
+        $ref: '#/definitions/facilities'
+      badges:
+        $ref: '#/definitions/badgesObject'
+      safetyandaccessibility:
+        $ref: '#/definitions/safetyandaccessibilityObject'
+      technology:
+        $ref: '#/definitions/technologyObject'
+
+  Preferences:
+    type: array
+    items:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The preference name
+        value:
+          type: string
+          description: The preference value
+  # Reviews will return a max of 10 reviews without a filter on review ratings. 10 most recent reviews will be returned
+  Reviews:
+    type: array
+    items:
+      $ref: "#/definitions/Review"
+  Review:
+    properties:
+      userNickName:
+        type: string
+        description: The reviewer's nick name
+      reviewText:
+        type: string
+        description: The review text
+      hotelMnemonic:
+        type: string
+        description: The hotel's mnemonic
+      userRating:
+        type: integer
+        description: The review user gave against a stay at this hotel on a scale of 1-5
+      reviewTitle:
+        type: string
+        description: The review title or summary
+      isRecommended:
+        type: boolean
+        description: The review user recommend this hotel or not
+      pros:
+        type: array
+        description: The hotel's pros
+        items:
+          type: string
+      cons:
+        type: array
+        description: The hotel's cons
+        items:
+          type: string
+      userCheckoutDate:
+        type: object
+        description: Checkout date
+        properties:
+          Label:
+            type: string
+          Value:
+            type: string
+          Id:
+            type: string
+      userLocation:
+        type: string
+        description: User location
+      memberStatus:
+        type: string
+        description: IHG Rewards Club member status
+      specificRatings:
+        type: object
+        description: The list of additional ratings like staff, room and so on
+        properties:
+          goals:
+            $ref: '#/definitions/SpecificRatingProperty'
+          staffService:
+            $ref: '#/definitions/SpecificRatingProperty'
+          value:
+            $ref: '#/definitions/SpecificRatingProperty'
+          roomComfort:
+            $ref: '#/definitions/SpecificRatingProperty'
+          atmosphereAmbiance:
+            $ref: '#/definitions/SpecificRatingProperty'
+          comments:
+            type: array
+            description: The list of comments
+            items:
+              $ref: "#/definitions/Comment"
+  SpecificRatingProperty:
+    type: object
+    properties:
+      valueRange:
+        type: integer
+      displayType:
+        type: string
+      value:
+        type: integer
+      label:
+        type: string
+      minLabel:
+        type: string
+      maxLabel:
+        type: string
+      id:
+        type: string
+      valueLabel:
+        type: string
+  Comment:
+    type: object
+    properties:
+      userNickname:
+        type: string
+        description: The user's nickname
+      commentText:
+        type: string
+        description: The comment text
+      submissionTime:
+        type: string
+        description: The time when user submitted the comment
+
+profileObject:
+  type: object
+  properties:
+    brandInfo:
+      $ref: '#/definitions/BrandInfo'
+    paymentmethods:
+      $ref: '#/definitions/paymentmethodsObject'
+    languagesspokenbystaff:
+      type: string
+    staypreferenceparticipation:
+      type: string
+
+paymentmethodsObject:
+  type: array
+  items:
+    creditcardsaccepted:
+      type: string
+
+  BrandInfo:
+   type: object
+   properties:
+     chainCode:
+       type: string
+       description: The 2 character chain code. This is also called the group code.
+     mnemonic:
+       type: string
+       description: The hotel mnemonic
+     brandName:
+       type: string
+       description: The brand name this hotel belongs to.
+     brandCode:
+       type: string
+       description: The 4 character group code that this hotel belongs to.
+  Technology:
+    type: object
+    properties:
+      guestRequestsVendorName:
+        type: string
+      pointofSaleVendorName:
+        type: string
+      webConfig:
+        type: object
+        properties:
+          priceCompare:
+            description: Shows the Trip Tease price comparison based on this indicator
+            type: object
+            properties:
+              listItem:
+                type: array
+                description: Shows the Trip Tease price comparison indicator per page
+                items:
+                  type: string
+  Profile:
+    type: object
+    properties:
+      latitude:
+        type: number
+        format: double
+        description: The hotel's latitude
+      longitude:
+        type: number
+        format: double
+        description: The hotel's longitude
+      isTpiLevel1Violator:
+        type: boolean
+        description: tpi1 violator flag. Hotels who violate IHG's terms once are considered level 1 violator
+      isTpiLevel2Violator:
+        type: boolean
+        description: tpi2 violator. Hotels who violate IHG's terms twice are considered level 2 violator
+      name:
+        type: string
+        description: The hotel name.
+      tag:
+        type: string
+        description: The hotel tag. For example, kimpton hotels have a tag that is different from a hotel name.
+      stripes:
+        type: object
+        description: Indicates if the Hotel is New to IHG, Opening Soon etc.
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+      technology:
+        type: object
+        properties:
+          guestRequestsVendorName:
+            type: string
+          pointofSaleVendorName:
+            type: string
+          webConfig:
+            type: object
+            properties:
+              priceCompare:
+                description: Shows the Trip Tease price comparison based on this indicator
+                type: object
+                properties:
+                  listItem:
+                    type: array
+                    description: Shows the Trip Tease price comparison indicator per page
+                    items:
+                      type: string
+      shortDescription:
+        type: string
+        description: The hotel short description.
+      longDescription:
+        type: string
+        description: The hotel long description.
+      totalReviews:
+        type: integer
+        description: The total reviews for a hotel
+      averageReview:
+        type: string
+        description: The hotel's average review on a scale of 1-5
+      overallRatingRange:
+        type: string
+        description: The hotel's overall raiting range on a scale of 1-5
+      timeZone:
+        type: string
+        description: The time zone of the hotel in IANA format
+      synexisId:
+        type: string
+        description: Identifier only for Kimpton Hotels
+      seoCity:
+        type: string
+        description: Identifier used by performance and marketing for SEO
+      marketingRegion:
+        type: string
+        description: The marketing region of the hotel
+      chinaBPG:
+        type: boolean
+        description: Shows BPG logo for China hotel based on this flag.
+      hotelStatus:
+        type: string
+        description: Status of the hotel like PRESELL, NEW, TEMPORARILY_CLOSED
+      openingDate:
+        type: string
+        description: The opening date for the hotel.
+      preSellDate:
+        type: string
+        description: The date the hotel is start accepting reservations.
+      dateOpened:
+        type: string
+        description: The date on which the hotel opened
+      dateClosed:
+        type: string
+        description: The date on which the hotel closed.
+      originType:
+        type: string
+        description: Origing type of the hotel. Required for Army hotels.
+      marketingPerformance:
+        type: string
+        description: Marketing Performance of the hotel.
+      creditCardAuthorizationParticipant:
+        type: boolean
+        description: Indicates if the hotel is a Credit Card Authorization Form Participant
+      independentNonIHGWebsiteURL:
+        type: string
+        description: Hotel Detail URL for independent hotels like Kimpton, SP etc.
+      currencyExchangeBillingNotification:
+        type: string
+        description: The notification warning for currency exhange on billing.
+      roomsIncludingSuitesCount:
+        type: integer
+        description: Total number of rooms in the hotel
+      growthHotelStatus:
+        type: string
+        description: The growth hotel status
+      languagesSpokenByStaff:
+        type: object
+        properties:
+          listItem:
+            type: array
+            description: The list of languages spoken by hotel staff
+            items:
+              type: string
+      primaryImageUrls:
+        type: object
+        properties:
+          originalUrl:
+           type: string
+           description: Primary media URL. Could be original image, original virtual tour image or primary video for video type.
+          formats:
+           type: array
+           description: Different formats of the media.
+           items:
+            type: object
+            properties:
+              aspectWidth:
+                type: string
+              aspectHeight:
+                type: string
+              url:
+                type: string
+      ihgBusinessRewardsParticipationPeriod:
+        type: object
+        properties:
+
+          startDate:
+            type: string
+            format: YYYY-MM-DD
+            description: Opt in date for business rewards.
+          endDate:
+            type: string
+            format: YYYY-MM-DD
+            description: Opt out date for business rewards.
+  Location:
+    type: object
+    properties:
+      introText:
+        type: string
+        description: The display text for the location
+      district:
+        type: string
+        description: The hotel's district. Example "historic district"
+      closestCity:
+        type: string
+        description: The closest city from the hotel
+      distanceToCityCenter:
+        type: string
+        description: The distance from the hotel to the nearest city's center.
+      unitOfMeasure:
+        type: string
+        description: String indicating miles or kilometers
+  Contact:
+    type: array
+    items:
+      type: object
+      properties:
+        faxNumber:
+          type: string
+          description: The fax number
+        reservationsPhoneNumber:
+          type: string
+          description: The call center number
+        reservationsPhoneNumberMessage:
+          type: boolean
+          description: The call center number message. Some numbers (for example starting with 0871 have a charge. IHG is legally obligated to display this message to the user)w
+        frontDeskNumber:
+          type: string
+          description: The front desk number
+        email:
+          type: string
+          description: The hotel's contact email
+
+Policies:
+    type: object
+    properties:
+      checkinTime:
+        type: string
+        description: earliest checkin time
+      checkoutTime:
+        type: string
+        description: earliest checkout time
+      acceptedCurrencies:
+        $ref: '#/definitions/Currencies'
+      pets:
+        $ref: '#/definitions/petsObject'
+      barloungedetail:
+        type: string
+      roomservice:
+        type: string
+      weaponsPolicy:
+        type: boolean
+      currencyDisclaimer:
+        type: string
+        description: Currency disclaimer to explain how the exchange rate and inflation would affect a booking for this hotel.
+      serviceChargeDetail:
+        type: object
+        properties:
+          description:
+            type: string
+            description: Service Charge disclaimer description to explain the extra charges for this hotel.
+
+petsObject:
+  type: array
+  items:
+    petsallowed:
+      type: string
+    guidedogsorserviceanimalsallowed:
+      type: string
+    depositperstay:
+      type: string
+    feepernight:
+      type: string
+    description:
+      type: string
+    petwalkingarea:
+      type: string
+
+  Currencies:
+    type: array
+    items:
+      $ref: '#/definitions/Currency'
+  Currency:
+    type: object
+    properties:
+      code:
+        type: string
+        description: The currency code
+      name:
+        type: string
+        description: The currency name
+      symbol:
+        type: string
+        description: The currency symbol
+  Address:
+    type: object
+    properties:
+      city:
+        type: string
+        description: The city
+      state:
+        $ref: '#/definitions/State'
+      country:
+        $ref: '#/definitions/Country'
+      gsaCode:
+        type: string
+        description: Code to indicate if the Hotel is part of Mainland China, Hong Kong or Macau.
+      zip:
+        type: string
+        description: The zip
+      street1:
+        type: string
+        description: The street address 1
+      street2:
+        type: string
+        description: The street address 2
+      street3:
+        type: string
+        description: The street address 2
+      street4:
+        type: string
+        description: The street address 2
+  State:
+    type: object
+    properties:
+      code:
+        type: string
+        description: The state code
+      name:
+        type: string
+        description: The state display name
+  Country:
+    type: object
+    properties:
+      code:
+        type: string
+        description: The country code
+      name:
+        type: string
+        description: The country display name
+  Marketing:
+    type: object
+    properties:
+      optOutDateB2B:
+        type: string
+        description: Opt out b2b date for select hotels used for performance marketing.
+      optOutDateWeb:
+        type: string
+        description: Opt out web date for select hotels used for performance marketing.
+  mediaObject:
+  type: object
+  properties:
+    welcomephotos:
+      $ref: '#/definitions/welcomephotosObject'
+    roomphotos:
+      $ref: '#/definitions/roomphotosObject'
+    amenityphotos:
+      $ref: '#/definitions/amenityphotosObject'
+    diningimages:
+      type: string
+    groupsandmeetingsphotos:
+      $ref: '#/definitions/groupsandmeetingsphotosObject'
+    roomvirtualtours:
+      type: string
+    primaryphotos:
+      type: string
+    videos:
+      $ref: '#/definitions/videosObject'
+    diningphotos:
+      $ref: '#/definitions/diningphotosObject'
+    conciergevideo:
+      $ref: '#/definitions/conciergevideoObject'
+    icdestinationphotos:
+      $ref: '#/definitions/icdestinationphotosObject'
+    requests:
+      type: string
+    diningvirtualimages:
+      type: string
+    amenityvirtualimages:
+      type: string
+    areaattractionphoto:
+      type: string
+
+welcomephotosObject:
+  type: array
+  items:
+    hotelexteriorphoto:
+      type: string
+
+roomphotosObject:
+  type: array
+  items:
+    guestroomphoto:
+      type: string
+    suitephoto:
+      type: string
+    kingbedguestroomphoto:
+      type: string
+    clubfloorroomphoto:
+      type: string
+    guestroomsimages:
+      type: string
+    guestroomsvirtualimages:
+      type: string
+
+amenityphotosObject:
+  type: array
+  items:
+    fitnesscenterphoto:
+      type: string
+
+groupsandmeetingsphotosObject:
+  type: array
+  items:
+    meetingroomphoto:
+      type: string
+    ballroomphoto:
+      type: string
+    meetingimages:
+      type: string
+    meetingvirtualimages:
+      type: string
+
+videosObject:
+  type: array
+  items:
+    customvideo:
+      $ref: '#/definitions/customvideoObject'
+
+diningphotosObject:
+  type: array
+  items:
+    barandloungephoto:
+      type: string
+    restaurantphoto:
+      type: string
+    finediningphoto:
+      type: string
+
+
+conciergevideoObject:
+  type: object
+  properties:
+    mainvideo:
+      $ref: '#/definitions/mainvideoObject'
+
+mainvideoObject:
+  type: object
+  properties:
+    file:
+      $ref: '#/definitions/fileObject'
+
+fileObject:
+  type: object
+  properties:
+    url:
+      type: string
+
+icdestinationphotosObject:
+  type: array
+  items:
+    exterior:
+      $ref: '#/definitions/exteriorObject'
+    destinationinterior:
+      $ref: '#/definitions/destinationinteriorObject'
+    interior:
+      $ref: '#/definitions/interiorObject'
+    insiderknowledge:
+      $ref: '#/definitions/insiderknowledgeObject'
+    atyourside:
+      $ref: '#/definitions/atyoursideObject'
+    welcome1:
+      $ref: '#/definitions/welcomeObject'
+    welcome2:
+      $ref: '#/definitions/welcomeObject'
+    welcomeimages:
+      type: string
+    welcomevirtualimages:
+      type: string
+
+welcomeObject:
+  type: object
+  properties:
+    image:
+      $ref: '#/definitions/imageObject'
+    caption:
+      type: string
+
+atyoursideObject:
+  type: object
+  properties:
+    image:
+      $ref: '#/definitions/imageObject'
+    caption:
+      type: string
+
+insiderknowledgeObject:
+  type: object
+  properties:
+    image:
+      $ref: '#/definitions/imageObject'
+    caption:
+      type: string
+
+destinationinteriorObject:
+  type: object
+  properties:
+    image:
+      $ref: '#/definitions/imageObject'
+    caption:
+      type: string
+
+exteriorObject:
+  type: object
+  properties:
+    image:
+      $ref: '#/definitions/imageObject'
+    caption:
+      type: string
+
+imageObject:
+  type: object
+  properties:
+    formats:
+      $ref: '#/definitions/formatsObject'
+
+formatsObject:
+  type: array
+  items:
+    format:
+      type: string
+
+
+facilitiesObject:
+  type: array
+  items:
+    rooms:
+      $ref: '#/definitions/roomsObject'
+    parking:
+      $ref: '#/definitions/parkingObject'
+    valetparkingavailable:
+      type: string
+    chargeforparking:
+      type: string
+    attractionsandrecreation:
+      $ref: '#/definitions/attractionsandrecreationObject'
+    adaaccessibleselfparkingavailable:
+      type: string
+    vanaccessibleparkinginselfparking:
+      type: string
+    complimentaryaccessibletransportationwithadvancednotice:
+      type: string
+    designatedaccessibleparkingspaceswithpostsigns:
+      type: string
+    flatterrainbetweenparkingandentrance:
+      type: string
+    hotelentranceisadaaccessible:
+      type: string
+    entrancesordoorsareadaaccessiblewithbeveledorflushthresholds:
+      type: string
+    routefromaccessiblepublicentrancetoregistrationareaaccessible:
+      type: string
+    publicrestroomsstallsarewheelchairaccessible:
+      type: string
+    conciergedeskadawheelchairaccessible:
+      type: string
+    hotelrestaurantadawheelchairaccessible:
+      type: string
+    exercisefacilityadawheelchairaccessible:
+      type: string
+    businesscenteradawheelchairaccessible:
+      type: string
+    registrationdeskadawheelchairaccessible:
+      type: string
+    publicrestroomsarewheelchairaccessible:
+      type: string
+    hotelentranceiswheelchairaccessible:
+      type: string
+    elevatorwheelchairaccessible:
+      type: string
+    guestroomwheelchairaccessiblerooms:
+      type: string
+    pooladawheelchairaccessible:
+      type: string
+    routefromaccessiblepublicentrancetobusinesscenteraccessible:
+      type: string
+    routefromaccessibleentrancetomeetingballroomareaisaccessible:
+      type: string
+    routefromaccessiblepublicentrancetoexercisefacilityaccessible:
+      type: string
+    routefromaccessiblepublicentrancetopoolaccessible:
+      type: string
+    wheelchairelevatoraccesstoalllevels:
+      type: string
+    wheelchairelevatoraccessibilityadacompliant:
+      type: string
+    wheelchairelevatornearaccessiblerooms:
+      type: string
+    guestroomsandaccessroutesareadaaccessible:
+      type: string
+    alldoorlocksandhardwareareadaaccessible:
+      type: string
+    controlsforheatingairconditionerlightsarewheelchairaccessible:
+      type: string
+    wheelchairguestroomaccessibilityfurniturerearrangeable:
+      type: string
+    wheelchairguestroomemergencycordorbuttoninbathrooms:
+      type: string
+    wheelchairguestroomemergencycordorbuttoninbedrooms:
+      type: string
+    wheelchairguestroomgrabbarswithspaceandtailtoilets:
+      type: string
+    wheelchairguestroombathroomwithclearturningspace:
+      type: string
+    wheelchairbathroomtubwithgrabbarsontwoadjacentwalls:
+      type: string
+    wheelchairbathroomportablebathtubseats:
+      type: string
+    wheelchairbathroombathtubseat:
+      type: string
+    wheelchairbathroomshowerswithhandheldshowerorhose:
+      type: string
+    wheelchairbathroomshowerswithbuiltintransfershowerseats:
+      type: string
+    wheelchairbathroomhandrails:
+      type: string
+    wheelchairbathroomrollinshowers:
+      type: string
+    wheelchairbathroomraisedtoiletwithgrabbars:
+      type: string
+    wheelchairbathroomsafetybar:
+      type: string
+    wheelchairbathroomdoorsopenoutwardinaccessiblerooms:
+      type: string
+    wheelchairbathroomaccessiblebathroomcontrols:
+      type: string
+    wheelchairaccessibilitydetails:
+      type: string
+    wheelchairavailable:
+      type: string
+    curbcutsandstreetparkingwheelchairaccessible:
+      type: string
+    closetswheelchairaccessible:
+      type: string
+    guestroomsandaccessroutesarewheelchairaccessible:
+      type: string
+    guestroomplumbingispaddedwithclearancebeneathvanity:
+      type: string
+    adaaccessiblerooms:
+      type: string
+    elevatoraccessibilitydetails:
+      type: string
+    routefromaccessiblepublicentrancetorestaurantaccessible:
+      type: string
+    publicrestroomsplumbingispaddedwithclearancebeneathvanity:
+      type: string
+    publicareaaccessibilitydetails:
+      $ref: '#/definitions/publicareaaccessibilitydetailsObject'
+    accessiblefacilitiesinpublicareas:
+      type: string
+    routefromaccessiblepublicentrancetospaaccessible:
+      type: string
+    wirelessinternet:
+      type: string
+    guestservices:
+      $ref: '#/definitions/guestservicesObject'
+    emailandinternet:
+      type: string
+    guesthighspeedinternetaccess:
+      type: string
+    languagedetailsmultiplelanguages:
+      type: string
+    restaurant:
+      $ref: '#/definitions/restaurantObject'
+    barandlounge:
+      $ref: '#/definitions/barandloungeObject'
+    barandloungecocktaillounge:
+      type: string
+    barandloungechampagnebar:
+      type: string
+    barandloungelounge24hrs:
+      type: string
+    winetastingonsiteind:
+      type: string
+    nightclubonsiteind:
+      type: string
+    barandloungededicatedlounge:
+      type: string
+    foodandbeverage:
+      $ref: '#/definitions/foodandbeverageObject'
+    publicareas:
+      $ref: '#/definitions/publicareasObject'
+
+publicareasObject:
+  type: array
+  items:
+    barbequegrills:
+      type: string
+
+foodandbeverageObject:
+  type: object
+  properties:
+    complimentarybreakfastbuffet:
+      type: string
+    complimentarycoffeeinlobby:
+      type: string
+    complimentarybreakfastdetails:
+      $ref: '#/definitions/complimentarybreakfastdetailsObject'
+    eveningreceptiondetails:
+      $ref: '#/definitions/eveningreceptiondetailsObject'
+
+complimentarybreakfastdetailsObject:
+  type: array
+  items:
+    complimentaryfullbreakfast:
+      $ref: '#/definitions/complimentaryfullbreakfastObject'
+    complimentarycontibreakfast:
+      $ref: '#/definitions/complimentarycontibreakfastObject'
+    complimentarybreakfastbuffet:
+      $ref: '#/definitions/complimentarybreakfastbuffetObject'
+    complimentarybreakfasthoursofoperation:
+      $ref: '#/definitions/complimentarybreakfasthoursofoperationObject'
+
+complimentaryfullbreakfastObject:
+  type: object
+  properties:
+    executiverooms:
+      type: string
+    suites:
+      type: string
+    standardrooms:
+      type: string
+
+complimentarycontibreakfastObject:
+  type: object
+  properties:
+    executiverooms:
+      type: string
+    suites:
+      type: string
+    standardrooms:
+      type: string
+
+complimentarybreakfastbuffetObject:
+  type: object
+  properties:
+    executiverooms:
+      type: string
+    suites:
+      type: string
+    standardrooms:
+      type: string
+
+complimentarybreakfasthoursofoperationObject:
+  type: object
+  properties:
+    hoursto:
+      type: string
+    hoursfrom:
+      type: string
+
+barandloungeObject:
+  type: object
+  properties:
+    menupdf:
+      type: string
+    liveentertainmentavailable:
+      type: string
+    name:
+      type: string
+    location:
+      type: string
+    operation:
+      $ref: '#/definitions/operationObject'
+    phonenumber:
+      type: string
+
+operation2Object:
+  type: object
+  properties:
+    hoursto:
+      type: string
+    hoursfrom:
+      type: string
+
+
+restaurantObject:
+  type: object
+  properties:
+    opentableapikey:
+      type: string
+    onsiterestaurantscount:
+      type: string
+    operation:
+      $ref: '#/definitions/operationObject'
+    roomservicemenupdf:
+      type: string
+    restaurantmenupdf:
+      type: string
+    roomservicedetails:
+      $ref: '#/definitions/roomservicedetailsObject'
+    restaurantdetails:
+      $ref: '#/definitions/restaurantdetailsObject'
+    name:
+      type: string
+    cuisinetype:
+      type: string
+    phonenumber:
+      type: string
+    address:
+      type: string
+    location:
+      type: string
+
+operationObject:
+  type: object
+  properties:
+    hoursfrom:
+      type: string
+    hoursto:
+      type: string
+    daysofweekopen:
+      type: string
+
+roomservicedetailsObject:
+  type: array
+  items:
+    hoursofoperation:
+      $ref: '#/definitions/hoursofoperationObject'
+    fullorlimitedmenu:
+      type: string
+    menu:
+      $ref: '#/definitions/menuObject'
+    roomservice:
+      $ref: '#/definitions/roomserviceObject'
+
+hoursofoperationObject:
+  type: object
+  properties:
+    hoursfrom:
+      type: string
+    hoursto:
+      type: string
+
+menuObject:
+  type: object
+  properties:
+    url:
+      type: string
+
+roomserviceObject:
+  type: object
+  properties:
+    executiverooms:
+      type: string
+    suites:
+      type: string
+    standardrooms:
+      type: string
+
+restaurantdetailsObject:
+  type: array
+  items:
+    restaurantdetail:
+      $ref: '#/definitions/restaurantdetailObject'
+
+restaurantdetailObject:
+  type: object
+  properties:
+    name:
+      type: string
+
+publicareaaccessibilitydetailsObject:
+  type: array
+  items:
+    onsiterestaurantshaveseatingavailableforwheelchairs:
+      type: string
+
+guestservicesObject:
+  type: array
+  items:
+    internetservices:
+      $ref: '#/definitions/internetservicesObject'
+    staffassistedservices:
+      $ref: '#/definitions/staffassistedservicesObject'
+
+internetservicesObject:
+  type: array
+  items:
+    wirelessinternetlocations:
+      $ref: '#/definitions/wirelessinternetlocationsObject'
+    highspeedinternetlocations:
+      $ref: '#/definitions/highspeedinternetlocationsObject'
+    wiredhighspeedinternetaccessdetails:
+      type: string
+    wirelesshighspeedinternetaccessdetails:
+      type: string
+    premiuminternetfee:
+      type: string
+    internetbrowserontvlocations:
+      $ref: '#/definitions/internetbrowserontvlocationsObject'
+
+wirelessinternetlocationsObject:
+  type: array
+  items:
+    standardroomavailable:
+      type: string
+    executiveroomavailable:
+      type: string
+    suiteavailable:
+      type: string
+    businesscenteravailable:
+      type: string
+    meetingspaceavailable:
+      type: string
+    publicspaceavailable:
+      type: string
+    standardroomfee:
+      type: string
+
+highspeedinternetlocationsObject:
+  type: array
+  items:
+    standardroomavailable:
+      type: string
+    executiveroomavailable:
+      type: string
+    suiteavailable:
+      type: string
+    businesscenteravailable:
+      type: string
+    meetingspaceavailable:
+      type: string
+    publicspaceavailable:
+      type: string
+    standardroomfee:
+      type: string
+
+internetbrowserontvlocationsObject:
+  type: array
+  items:
+    standardroomavailable:
+      type: string
+    suiteavailable:
+      type: string
+
+
+staffassistedservicesObject:
+  type: array
+  items:
+    languagedetails:
+      $ref: '#/definitions/languagedetailsObject'
+
+languagedetailsObject:
+  type: array
+  items:
+    languages:
+      type: string
+
+roomsObject:
+  type: array
+  items:
+    hotelhighlights:
+      $ref: '#/definitions/hotelhighlightsObject'
+
+hotelhighlightsObject:
+  type: array
+  items:
+    buildingdetails:
+      $ref: '#/definitions/buildingdetailsObject'
+
+buildingdetailsObject:
+  type: array
+  items:
+    numberofguestrooms:
+      type: string
+    numberoffloors:
+      type: string
+    numberofsuites:
+      type: string
+    numberofnonsmokingrooms:
+      type: string
+
+parkingObject:
+  type: object
+  properties:
+    carparkingavailable:
+      type: string
+    dailyvaletparkingfee:
+      type: string
+    parkingdescription:
+      type: string
+    numberofparkingspaces:
+      type: string
+    dailyselfparkingfee:
+      type: string
+    complimentarydailyselfparking:
+      type: string
+
+attractionsandrecreationObject:
+  type: object
+  properties:
+    corporatelocation:
+      $ref: '#/definitions/corporatelocationObject'
+    attractions:
+      $ref: '#/definitions/attractionsObject'
+    outdoorrecreation:
+      $ref: '#/definitions/outdoorrecreationObject'
+    indoorrecreation:
+      $ref: '#/definitions/indoorrecreationObject'
+    waterrecreation:
+      $ref: '#/definitions/waterrecreationObject'
+    otherattractions:
+      $ref: '#/definitions/otherattractionsObject'
+    indoorrecreationtabletennisonsiteind:
+      type: string
+    indoorrecreationindoortenniscourtsonsiteind:
+      type: string
+    indoorrecreatiobilliardsonsiteind:
+      type: string
+    indoorrecreationbowlingonsiteind:
+      type: string
+    indooriceskatingonsiteind:
+      type: string
+    indoorrollerskating:
+      type: string
+    indoorrecreationracquetball:
+      type: string
+    tanningbedsonsiteind:
+      type: string
+
+waterrecreationObject:
+  type: object
+  properties:
+    fishing:
+      type: string
+    jetskiing:
+      type: string
+    boatingorsailing:
+      type: string
+    scubadiving:
+      type: string
+    waterskiing:
+      type: string
+    swimming:
+      type: string
+    snorkeling:
+      type: string
+    surfing:
+      type: string
+
+otherattractionsObject:
+  type: array
+  items:
+    librarydetails:
+      $ref: '#/definitions/librarydetailsObject'
+    worshiplocations:
+      $ref: '#/definitions/worshiplocationsObject'
+    attractiondetails:
+      $ref: '#/definitions/attractiondetailsObject'
+
+librarydetailsObject:
+  type: array
+  items:
+    librarydetail:
+      type: string
+
+attractiondetailsObject:
+  type: array
+  items:
+    attractiondetail:
+      type: string
+
+corporatelocationObject:
+  type: object
+  properties:
+    corporationdetails:
+      $ref: '#/definitions/corporationdetailsObject'
+
+corporationdetailsObject:
+  type: array
+  items:
+    corporationdetail:
+      type: string
+
+attractionsObject:
+  type: array
+  items:
+    sightseeingtours:
+      type: string
+    museumorgallery:
+      type: string
+    racetrackdetails:
+      $ref: '#/definitions/racetrackdetailsObject'
+    zoooraquariumdetails:
+      $ref: '#/definitions/zoooraquariumdetailsObject'
+    sportsvenuedetails:
+      $ref: '#/definitions/sportsvenuedetailsObject'
+    themeparkdetails:
+      $ref: '#/definitions/themeparkdetailsObject'
+    collegeoruniversitydetails:
+      $ref: '#/definitions/collegeoruniversitydetailsObject'
+
+acetrackdetailsObject:
+  type: array
+  items:
+    racetrackdetail:
+      type: string
+
+zoooraquariumdetailsObject:
+  type: array
+  items:
+    zoooraquariumdetail:
+      type: string
+
+sportsvenuedetailsObject:
+  type: array
+  items:
+    sportsvenuedetail:
+      type: string
+
+themeparkdetailsObject:
+  type: array
+  items:
+    themeparkdetail:
+      type: string
+
+collegeoruniversitydetailsObject:
+  type: array
+  items:
+    collegeoruniversitydetail:
+      type: string
+
+outdoorrecreationObject:
+  type: object
+  properties:
+    parkdetails:
+      $ref: '#/definitions/parkdetailsObject'
+    movietheaterdetails:
+      $ref: '#/definitions/movietheaterdetailsObject'
+    basketball:
+      type: string
+    bicycling:
+      type: string
+    joggingtrack:
+      type: string
+    baseball:
+      type: string
+    archery:
+      type: string
+    badminton:
+      type: string
+    mountainorrockwallclimbing:
+      type: string
+    hunting:
+      type: string
+    volleyball:
+      type: string
+    outdooriceskating:
+      type: string
+    outdoorrollerskating:
+      type: string
+    snowskiing:
+      type: string
+    miniaturegolf:
+      type: string
+    soccer:
+      type: string
+    americanfootball:
+      type: string
+    hiking:
+      type: string
+    squash:
+      type: string
+    horsebackriding:
+      type: string
+    racquetball:
+      type: string
+    outdoortenniscourts:
+      $ref: '#/definitions/outdoortenniscourtsObject'
+    golfcoursedetails:
+      type: string
+    cricket:
+      type: string
+
+parkdetailsObject:
+  type: array
+  items:
+    parkdetail:
+      type: string
+
+movietheaterdetailsObject:
+  type: array
+  items:
+    movietheaterdetail:
+      type: string
+
+outdoortenniscourtsObject:
+  type: array
+  items:
+    distance:
+      type: string
+
+indoorrecreationObject:
+  type: object
+  properties:
+    activitiesdescription:
+      type: string
+    billiards:
+      type: string
+    bowling:
+      type: string
+    indooriceskating:
+      type: string
+    indoorrollerskating:
+      type: string
+    racquetball:
+      type: string
+    tabletennis:
+      type: string
+    indoortenniscourts:
+      $ref: '#/definitions/indoortenniscourtsObject'
+    tanningbeds:
+      type: string
+
+indoortenniscourtsObject:
+  type: array
+  items:
+    distance:
+      type: string
+
+safetyandaccessibilityObject:
+  type: object
+  properties:
+    wheelchairaccessibility:
+      $ref: '#/definitions/wheelchairaccessibilityObject'
+
+wheelchairaccessibilityObject:
+  type: object
+  properties:
+    parkingaccessibilitydetails:
+      type: string
+    publicareaaccessibilitydetails:
+      type: string
+    guestroomaccessibilitydetails:
+      type: string
+
+technologyObject:
+  type: object
+  properties:
+    guestRequestsVendorName:
+      type: string
+    pointofSaleVendorName:
+      type: string
+    digitalroomservice:
+      type: string
+    grubhubmarket:
+      type: string
+    webConfig:
+      type: object
+      properties:
+        priceCompare:
+          description: Shows the Trip Tease price comparison based on this indicator
+          type: object
+          properties:
+            listItem:
+              type: array
+              description: Shows the Trip Tease price comparison indicator per page
+              items:
+                type: string
+
+  Errors:
+    type: object
+    properties:
+      code:
+        type: string
+        description: The overall error code
+      message:
+        type: string
+        description: A descriptive message to describe the error
+      source:
+        type: string
+        description: Optional indication of the platform where the failure occurred.  This value is optional.
+      errors:
+        type: array
+        description: The list of additional errors.  This value is optional.
+        items:
+            $ref: '#/definitions/Error'
+  Error:
+    type: object
+    properties:
+      code:
+        type: string
+        description: The error code
+      message:
+        type: string
+        description: The error message
+parameters:
+  LanguageHeader:
+    name: IHG-LANGUAGE
+    in: header
+    description: |
+      This header indicates the end user's language preference as determined by the API consumer.
+      Text fields may be translated into the given language in the response.
+      The format of the header is language-LOCALE (e.g., en-US) with both language and locale values
+      being case sensitive.
+    type: string
+    required: false
+    default: en-US
+securityDefinitions:
+  ApiKey:
+    type: apiKey
+    name: X-IHG-API-KEY
+    in: header
